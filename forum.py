@@ -6,11 +6,11 @@ from multilistbox import *
 
         
 class Sujet:
-    def __init__(self, _id, nom, date, nb, dernier, parent):
+    def __init__(self, _id, nom, date, nbMessages, dernier, parent):
         self.id = _id
         self.nom = nom
         self.date = date
-        self.nb = nb
+        self.nbMessages = nbMessages
         self.dernier = dernier
         self.parent = parent
 
@@ -19,7 +19,7 @@ class Vue():
         self.forum = Tk()
         self.commandes = commandes
         
-        self.mlb = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Stuff', 10)))
+        self.mlb = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Nombre de messages', 10)))
         self.remplirListe()
         #for i in range(1000):
         #    mlb.insert(END, ('Important Message: %d' % i, 'John Doe', '10/10/%04d' % (1900+i)))
@@ -32,7 +32,7 @@ class Vue():
         sujets = self.commandes.searchSujet()
         print("sujets", sujets)
         for sujet in sujets:
-            self.mlb.insert(END, ('Important Message: ' + sujet.nom, sujet.date, sujet.dernier))
+            self.mlb.insert(END, ('Important Message: ' + sujet.nom, sujet.date, sujet.nbMessages))
 
     def visioner(self,event):
        print (event)
