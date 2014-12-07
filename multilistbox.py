@@ -37,8 +37,9 @@ class MultiListbox(Frame):
         return 'break'
 
     def _scroll(self, *args):
+        print(args)
         for l in self.lists:
-            l.yview(args)
+            l.yview_scroll(1, "units")
 
     def curselection(self):
         return self.lists[0].curselection()
