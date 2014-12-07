@@ -7,10 +7,9 @@ nomDB = "FORUM"
 class Commandes():
     def __init__(self):
         self.startUp()
-        self.v = Vue(self)
+        self.v = SujetVue(self)
         self.v.forum.mainloop()
 
-        
     def startUp(self):
         try:
             self.nomDB = "FORUM"
@@ -151,15 +150,6 @@ class Commandes():
     def nouveauMessage(self):
         pass
 
-
-class User():
-    def __init__(self, _id,nom,prenom,username,passwd, mail):
-        self.id = _id
-        self.nom = nom
-        self.prenom = prenom
-        self.username = username
-        self.passwd = passwd
-        self.mail = mail
 
 def main():
     c = Commandes()
