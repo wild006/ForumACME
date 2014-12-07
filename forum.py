@@ -5,8 +5,8 @@ from multilistbox import *
 
 forum = Tk()
 
-def visioner(event, n):
-    print(a.sujet.get(a.sujet.curselection()[0]))
+def visioner(event):
+    print (event)
 
 def supprimer(event):
     pass
@@ -77,13 +77,11 @@ class SujetView:
             self.supprimer.insert(END, Button(forum, text="supprimer", command=supprimer))
 
 
-mlb = MultiListbox(forum, (('Subject', 40), ('Sender', 20), ('Date', 10)))
+mlb = MultiListbox(forum, (('Message', 40), ('Date', 20), ('Stuff', 10)))
 for i in range(1000):
     mlb.insert(END, ('Important Message: %d' % i, 'John Doe', '10/10/%04d' % (1900+i)))
 mlb.pack(expand=YES,fill=BOTH)
-forum.mainloop()
-#s = (Sujet(0, "Premier", "hier", "23", "demain", None),
-#     Sujet(1, "Second", "demain", "11", "hier", 0))
 
-#a = SujetView(s)
-#but = Button(forum, text="visioner", command=lambda e: visioner(e, 0))
+btn = Button(forum, text="stuff", command=lambda: visioner(mlb.curselection()))
+btn.pack()
+forum.mainloop()
