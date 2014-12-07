@@ -3,9 +3,24 @@
 from tkinter import *
 from multilistbox import *
 
+class User():
+    def __init__(self, _id, nom, prenom, username, passwd, mail):
+        self.id = _id
+        self.nom = nom
+        self.prenom = prenom
+        self.username = username
+        self.passwd = passwd
+        self.mail = mail
 
+class Message():
+    def __init__(self, _id, text, date, auteur, sujetid):
+        self.id = _id
+        self.texte = text
+        self.date = date
+        self.auteur = auteur
+        self.sujetid = sujetid
         
-class Sujet:
+class Sujet():
     def __init__(self, _id, nom, date, nbMessages, dernier, parent):
         self.id = _id
         self.nom = nom
