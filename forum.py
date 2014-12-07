@@ -11,13 +11,6 @@ def visioner(event):
 def supprimer(event):
     pass
         
-class Suj:
-    def __init__(self, sujet, date, nb, last, i):
-        self.liste = Listbox(forum)
-        self.liste.bind('<<ListboxSelect>>', lambda e: visioner(e, i))
-        self.liste.insert(END, sujet + " " + date + " " + str(nb) + " " + last)
-        self.liste.pack()
-
 class Sujet:
     def __init__(self, _id, sujet, date, nb, dernier, parent):
         self.id = _id
@@ -26,56 +19,6 @@ class Sujet:
         self.nb = nb
         self.dernier = dernier
         self.parent = parent
-        
-class SujetView:
-    def __init__(self, sujets):
-        self.sujet = Listbox(forum)
-        self.sujet.grid(row=0,column=0)
-        self.nbmess = Listbox(forum)
-        self.nbmess.grid(row=0,column=1)
-        self.dernier = Listbox(forum)
-        self.dernier.grid(row=0,column=2)
-        self.visioner = Listbox(forum)
-        self.visioner.grid(row=0,column=3)
-        self.supprimer = Listbox(forum)
-        self.supprimer.grid(row=0,column=4)
-
-        s = []
-        n = []
-        d = []
-        _id = []
-        
-        for i in sujets:
-            _id.append(i.id)
-            s.append(i.sujet)
-            n.append(i.nb)
-            d.append(i.date)
-            
-        self.populeSujet(s)
-        self.populeNb(n)
-        self.populeDernier(d)
-        self.populeAct(len(sujets))
-                         
-
-    def populeSujet(self, sujets):
-        for s in sujets:
-            self.sujet.insert(END,s)
-
-    def populeNb(self, nbs):
-        for i in nbs:
-            self.nbmess.insert(END, i)
-
-    def populeDernier(self, lst):
-        for l in lst:
-            self.dernier.insert(END, l)
-
-    def populeAct(self, n):
-        self.sujet.bind('<<ListboxSelect>>', lambda e: visioner(e, 0))
-        for i in range(n):
-            self.visioner.insert(END, (i, "visioner"))
-        for i in range(n):
-            self.supprimer.insert(END, Button(forum, text="supprimer", command=supprimer))
-
 
 mlb = MultiListbox(forum, (('Message', 40), ('Date', 20), ('Stuff', 10)))
 for i in range(1000):
