@@ -39,8 +39,8 @@ class SujetVue():
         self.remplirListe()
         self.boxSujet.pack(expand=YES,fill=BOTH)
 
-        btn = Button(self.forum, text="stuff", command=lambda: self.visioner(self.boxSujet.curselection()))
-        btn.pack()
+        Button(self.forum, text="Visioner", command=lambda: self.visioner(self.boxSujet.curselection())).pack()
+        Button(self.forum, text="Supprimer", command=lambda: self.supprimer(self.boxSujet.curselection())).pack()
 
     def remplirListe(self):
         sujets = self.commandes.searchSujets() #[Sujet(0, "Un", "hier", "2", "demain", None), Sujet(1, "Deux", "demain", "3", "hier", None)]
@@ -51,19 +51,28 @@ class SujetVue():
         MessageVue(event[0], self.commandes)
 
     def supprimer(self, event):
-        pass
+        self.commandes.supprimerSujetParID(event[0]) # TODO: Le faire :D
 
 class MessageVue():
     def __init__(self, n, commandes):
         """Affiche les messages du sujet a l'id `n'"""
         self.commandes = commandes
-        self.id = n +1
+        self.id = int(n) + 1
         self.mess = Tk()
         self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
         self.message.pack(expand=YES, fill=BOTH)
         self.remplirListe()
 
+        Button(self.mess, text="Ajouter", command=self.ajouter).pack()
+        Button(self.mess, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
+
     def remplirListe(self):
         messages = self.commandes.searchMessages(self.id) #[Message(0, "Premier", "Jamais", "Moi", self.id), Message(1, "Second", "Toujours", "L'autre", self.id)]
         for m in messages:
             self.message.insert(END,(m.texte, m.auteur, m.date))
+
+    def ajouter(self):
+        Text().pack()
+
+    def supprimer(self, n):
+        self.commandes.supprimerMessageParID(self.id, n) # TODO: Prend l'id du sujet pour trouver le bon message
