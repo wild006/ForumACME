@@ -13,11 +13,12 @@ class User():
         self.mail = mail
 
 class Message():
-    def __init__(self, _id, text, date, auteur, sujetid):
+    def __init__(self, _id, text, date, auteur,reponse, sujetid):
         self.id = _id
         self.texte = text
         self.date = date
         self.auteur = auteur
+        self.reponse = reponse
         self.sujetid = sujetid
         
 class Sujet():
@@ -42,7 +43,7 @@ class SujetVue():
         btn.pack()
 
     def remplirListe(self):
-        sujets = self.commandes.searchSujet() #[Sujet(0, "Un", "hier", "2", "demain", None), Sujet(1, "Deux", "demain", "3", "hier", None)]
+        sujets = self.commandes.searchSujets() #[Sujet(0, "Un", "hier", "2", "demain", None), Sujet(1, "Deux", "demain", "3", "hier", None)]
         for sujet in sujets:
             self.boxSujet.insert(END, ('Important Message: ' + sujet.nom, sujet.date, sujet.nbMessages))
 
@@ -56,13 +57,13 @@ class MessageVue():
     def __init__(self, n, commandes):
         """Affiche les messages du sujet a l'id `n'"""
         self.commandes = commandes
-        self.id = n
+        self.id = n +1
         self.mess = Tk()
         self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
         self.message.pack(expand=YES, fill=BOTH)
         self.remplirListe()
 
     def remplirListe(self):
-        messages = self.commandes.trouveSujet(self.id) #[Message(0, "Premier", "Jamais", "Moi", self.id), Message(1, "Second", "Toujours", "L'autre", self.id)]
+        messages = self.commandes.searchMessages(self.id) #[Message(0, "Premier", "Jamais", "Moi", self.id), Message(1, "Second", "Toujours", "L'autre", self.id)]
         for m in messages:
             self.message.insert(END,(m.texte, m.auteur, m.date))

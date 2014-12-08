@@ -6,23 +6,27 @@ nomDB = "FORUM"
 
 class Commandes():
     def __init__(self):
+        self.user = "root"
+        self.passwd = "AAAaaa111"
+        self.host = "127.0.0.1"
+        self.nomDB = "FORUM"
         self.startUp()
         self.v = SujetVue(self)
         self.v.forum.mainloop()
 
+
     def startUp(self):
         try:
-            self.nomDB = "FORUM"
-            db = mysql.connector.connect(user='root', password='AAAaaa111',
-                                          host='127.0.0.1',
-                                         database= nomDB)
+            db = mysql.connector.connect(user=self.user, password=self.passwd,
+                                          host=self.host,
+                                         database= self.nomDB)
             #Tester toutes les tables ? (Corrumption)
         except:
             print("pas créé !")
-            db = mysql.connector.connect(host="localhost",
-                                         user="root",passwd="AAAaaa111")
+            db = mysql.connector.connect(host=self.host,
+                                         user=self.user,passwd=self.passwd)
             self.executeScript("forumDB.sql", db)
-            db = self.connectionDB('root','AAAaaa111','127.0.0.1',self.nomDB)
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             self.executeScript("forumTables.sql", db)
 
         #POUR DES TESTS
@@ -30,10 +34,13 @@ class Commandes():
         self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('LOL', '1776-7-4 04:13:54')", True)
         self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('Pourquoi pas ? ', '1776-7-4 04:13:54')", True)
         #INSERTION DE MESSAGES
-        idSujet = self.trouveIdSujet("'LOL'")
-        print("id",idSujet)
-        if idSujet:
-            self.executeCommand("INSERT INTO MESSAGE(texte, sujet) VALUES('Un message très important !!', " + str(idSujet) + ")", True)
+        self.insererMessage("'LOL'", "'Premier insert'")
+        self.insererMessage("'LOL'", "'Deuxième insert'")
+        self.insererMessage("'Pourquoi pas ? '", "'Un autre message !!!'")
+        #idSujet = self.trouveIdSujet("'LOL'")
+        #print("id",idSujet)
+        #if idSujet:
+        #    self.executeCommand("INSERT INTO MESSAGE(texte, sujet) VALUES('Un message très important !!', " + str(idSujet) + ")", True)
 
     def connectionDB(self,user, password, host, nomBD):
         return mysql.connector.connect(user=user, password=password,
@@ -42,16 +49,22 @@ class Commandes():
 
     def executeCommand(self,command, commit = False):
         #POUR DES TESTS !
-        db = self.connectionDB('root','AAAaaa111','127.0.0.1',self.nomDB)
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
         cursor.execute(command)
         if commit:
             db.commit()
         db.close()
 
+    def insererMessage(self, nomSujet, texte):
+        idSujet = self.trouveIdSujet(nomSujet)
+        print("id",idSujet)
+        if idSujet:
+            self.executeCommand("INSERT INTO MESSAGE(texte, sujet) VALUES(" + str(texte) + " , " + str(idSujet) + ")", True)
+
     def trouveIdSujet(self,nomSujet):
         try:
-            db = self.connectionDB('root','AAAaaa111','127.0.0.1',self.nomDB)
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
             command = "SELECT id FROM SUJET WHERE nom = " + nomSujet
             print(command)
@@ -98,10 +111,10 @@ class Commandes():
         except:
             print("pas trouvé")
 
-    def searchSujet(self):
+    def searchSujets(self):
         cursor = -1 #Pas trouvé
         try:
-            db = self.connectionDB('root','AAAaaa111','127.0.0.1',self.nomDB)
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
             command = "SELECT * FROM SUJET"
             print(command)
@@ -120,12 +133,13 @@ class Commandes():
         return sujets
 
     def searchNbMessages(self,sujet):
-        if True:
-            db = self.connectionDB('root','AAAaaa111','127.0.0.1',self.nomDB)
+        try:
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
             print(sujet)
             idSujet = self.trouveIdSujet(sujet)
             if idSujet == None:
+                db.close()
                 return 0
             command = "SELECT COUNT(*) FROM MESSAGE WHERE sujet = " + str(idSujet)
             print(command)
@@ -136,12 +150,28 @@ class Commandes():
             db.close()
             print(result[0])
             return result[0]
-        else:
+        except:
             print("pas trouvé")
             db.close()
             
         return 0
 
+    def searchMessages(self, idSujet):
+        try:
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            cursor = db.cursor()
+            command = "SELECT * FROM MESSAGE WHERE sujet = " + str(idSujet)
+            cursor.execute(command)
+        except:
+            db.close()
+
+        messages = []
+        
+        for (_id, text, date, reponse,user,sujet) in cursor:
+            message = Message(_id,text,date,user,reponse, sujet)
+            messages.append(message)
+        db.close()
+        return messages
         
 
     def connectionUser(self):
