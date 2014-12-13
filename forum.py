@@ -61,18 +61,23 @@ class MessageVue():
         self.mess = Tk()
         self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
         self.message.pack(expand=YES, fill=BOTH)
+        self.messages = [] #Tous les messages de la liste
         self.remplirListe()
 
         Button(self.mess, text="Ajouter", command=self.ajouter).pack()
         Button(self.mess, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
 
     def remplirListe(self):
-        messages = self.commandes.searchMessages(self.id) #[Message(0, "Premier", "Jamais", "Moi", self.id), Message(1, "Second", "Toujours", "L'autre", self.id)]
-        for m in messages:
+        self.messages = self.commandes.searchMessages(self.id) #[Message(0, "Premier", "Jamais", "Moi", self.id), Message(1, "Second", "Toujours", "L'autre", self.id)]
+        for m in self.messages:
             self.message.insert(END,(m.texte, m.auteur, m.date))
 
     def ajouter(self):
         Text().pack()
 
     def supprimer(self, n):
-        self.commandes.supprimerMessageParID(self.id, n) # TODO: Prend l'id du sujet pour trouver le bon message
+        indiceMessageListe = n[0]
+        messageAsupprimer = self.messages[indiceMessageListe]
+        self.commandes.supprimerMessageParID(messageAsupprimer.id, self.id) # TODO: Prend l'id du sujet pour trouver le bon message
+        del self.messages[indiceMessageListe] #Delete le message dans la liste
+        #TOD: REFRESH

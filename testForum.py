@@ -172,7 +172,15 @@ class Commandes():
             messages.append(message)
         db.close()
         return messages
-        
+
+    def supprimerMessageParID(self, idMessage, idSujet):
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i  " % (idMessage, idSujet)
+        print(command)
+        cursor.execute(command)
+        db.commit()
+        db.close()
 
     def connectionUser(self):
         pass
