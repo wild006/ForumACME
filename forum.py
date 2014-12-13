@@ -77,6 +77,9 @@ class MessageVue():
         self.commandes = commandes
         self.id = int(n) + 1
         self.mess = Tk()
+
+        self.mess.title = self.commandes.trouveTitreSujetByID(self.id) # Voir l'item du TODO
+
         self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
         self.message.pack(expand=YES, fill=BOTH)
         self.messages = [] # Tous les messages de la liste

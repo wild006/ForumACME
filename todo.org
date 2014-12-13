@@ -1,7 +1,10 @@
 #+TODO: TODO STARTED | WAITING | DONE CANCELED
 * DONE Faire que les messages très long soit vu sur plusieurs lignes
   Ajouter un '\n' à chaque 80 char, si le-dit char est un espace.
-* TODO Mettre le titre du sujet comme titre de la fenêtre du message
+* STARTED Mettre le titre du sujet comme titre de la fenêtre du message
+  Faut repasser par la DB.
+  En gros la listbox me permet que d'avoir l'id.
+  Doooooonc, faut passer par la DB.
 * TODO Actualiser le nombre de message lorsqu'on ajoute un message (dans la vue sujet)
 * TODO Aller chercher le user
   http://stackoverflow.com/a/2899055
