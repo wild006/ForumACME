@@ -1,5 +1,5 @@
 #+TODO: TODO STARTED | WAITING | DONE CANCELED
-* TODO Faire que les messages très long soit vu sur plusieurs lignes
+* DONE Faire que les messages très long soit vu sur plusieurs lignes
   Ajouter un '\n' à chaque 80 char, si le-dit char est un espace.
 * TODO Mettre le titre du sujet comme titre de la fenêtre du message
 * TODO Actualiser le nombre de message lorsqu'on ajoute un message (dans la vue sujet)

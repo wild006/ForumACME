@@ -89,8 +89,21 @@ class MessageVue():
         self.message.delete(0, END)
         self.messages = self.commandes.searchMessages(self.id) #[Message(1, "Premier", "Jamais", "Moi", self.id, self.id), Message(2, "Second", "Toujours", "L'autre", self.id, self.id)]
         for m in self.messages:
+            m.texte = self.chopMessage(m)
             self.message.insert(END,(m.texte, m.auteur, m.date))
 
+    def chopMessage(mess):
+        achop = False
+        result = ""
+        for i in range(len(mess)):
+            if achop and mess.texte[i] == ' ':
+                result += '\n'
+                achop = False
+            if (i % 80) == 0:
+                achop = True
+            result += mess.texte[i]
+        return result
+            
     def ajouter(self):
         nmess = Tk()
         texte = Text(nmess)
