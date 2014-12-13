@@ -36,6 +36,7 @@ class SujetVue():
         self.commandes = commandes
         
         self.boxSujet = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Nombre de messages', 10)))
+        self.sujets = [] # Tous les sujets
         self.remplirListe()
         self.boxSujet.pack(expand=YES,fill=BOTH)
 
@@ -43,15 +44,20 @@ class SujetVue():
         Button(self.forum, text="Supprimer", command=lambda: self.supprimer(self.boxSujet.curselection())).pack()
 
     def remplirListe(self):
-        sujets = self.commandes.searchSujets() #[Sujet(0, "Un", "hier", "2", "demain", None), Sujet(1, "Deux", "demain", "3", "hier", None)]
-        for sujet in sujets:
+        self.sujets = self.commandes.searchSujets() #[Sujet(0, "Un", "hier", "2", "demain", None), Sujet(1, "Deux", "demain", "3", "hier", None)]
+        for sujet in self.sujets:
             self.boxSujet.insert(END, ('Important Message: ' + sujet.nom, sujet.date, sujet.nbMessages))
 
     def visioner(self, event):
         MessageVue(event[0], self.commandes)
 
     def supprimer(self, event):
-        self.commandes.supprimerSujetParID(event[0]) # TODO: Le faire :D
+        indiceSujetListe = event[0]
+        sujetASupprimer = self.sujets[indiceSujetListe]
+        self.commandes.supprimerSujetParID(sujetASupprimer.id) # TODO: Le faire :D
+        del self.sujets[indiceSujetListe] #Delete le sujet dans la liste
+        self.boxSujet.delete(indiceSujetListe)
+        #TOD: REFRESH
 
 class MessageVue():
     def __init__(self, n, commandes):
@@ -61,7 +67,7 @@ class MessageVue():
         self.mess = Tk()
         self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
         self.message.pack(expand=YES, fill=BOTH)
-        self.messages = [] #Tous les messages de la liste
+        self.messages = [] # Tous les messages de la liste
         self.remplirListe()
 
         Button(self.mess, text="Ajouter", command=self.ajouter).pack()
