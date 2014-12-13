@@ -1,0 +1,29 @@
+#+TODO: TODO STARTED | WAITING | DONE CANCELED
+* TODO Faire que les messages très long soit vu sur plusieurs lignes
+  Ajouter un '\n' à chaque 80 char, si le-dit char est un espace.
+* TODO Mettre le titre du sujet comme titre de la fenêtre du message
+* TODO Actualiser le nombre de message lorsqu'on ajoute un message (dans la vue sujet)
+* TODO Aller chercher le user
+  http://stackoverflow.com/a/2899055
+* WAITING Mettre le user dans la BD quand on crée un message/sujet
+  Voir point au dessus.
+* DONE Afficher l'auteur du message
+* TODO Pouvoir répondre à un message
+* TODO Pouvoir faire un sujet enfant (voir la différence visuel) (Est* TODOce qu'on peut faire des messages dans des sujet parent ?)
+* TODO Pouvoir ordonné les messages par date/user
+* TODO Pouvoir ordonné les sujets par date/user
+* TODO Supprimer seulement si tu es le créatuer du sujet/message (ou être un admin du forum ?)
+* WAITING Pouvoir (au début de l'application ou dans les options) changer l'emplacement de la BD (e.g.: local ou donne l'adresse ip)
+  C'est un truc d'entreprise, on veut ça?
+* WAITING Faire un profil pour voir les users
+  Tu veux dire, les gens avec qui tu travailles?
+  C'est pertinent?
+* WAITING Mettre un photo de profil/ infos sur le profil du forum
+  cf, point au dessus.
+* TODO Faire une recherche dans les sujets
+* TODO Faire une recherche dans les messages
+* TODO Ajout du niveau d'importance des sujets/messages
+* TODO Ajout de message favoris (pour pouvoir accèder rapidement à ces messages)
+* TODO Ajout d'indexs !
+* TODO ergonomie (ouais y'a des points pour ça)
+  T'as un problème avec mes boutons?
