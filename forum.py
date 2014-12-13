@@ -36,6 +36,7 @@ class SujetVue():
         self.commandes = commandes
         
         self.boxSujet = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Nombre de messages', 10)))
+        self.sujets = [] # Tous les sujets
         self.remplirListe()
         self.boxSujet.pack(expand=YES,fill=BOTH)
 
@@ -78,6 +79,7 @@ class MessageVue():
         self.mess = Tk()
         self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
         self.message.pack(expand=YES, fill=BOTH)
+        self.messages = [] # Tous les messages de la liste
         self.remplirListe()
 
         Button(self.mess, text="Ajouter", command=self.ajouter).pack()
@@ -101,4 +103,5 @@ class MessageVue():
         self.remplirListe()
 
     def supprimer(self, n):
-        self.commandes.supprimerMessageParID(self.id, n) # TODO: Prend l'id du sujet pour trouver le bon message
+        self.commandes.supprimerMessageParID(event[0], self.id) # TODO: Prend l'id du sujet pour trouver le bon message
+        self.replirListe()

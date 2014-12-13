@@ -130,6 +130,7 @@ class Commandes():
             print("i", _id,nom,date,dernier,parent)
             sujets.append(sujet)
         db.close()
+        print("sujets", sujets[0].id)
         return sujets
 
     def searchNbMessages(self,sujet):
@@ -172,7 +173,33 @@ class Commandes():
             messages.append(message)
         db.close()
         return messages
-        
+
+    def supprimerMessageParID(self, idMessage, idSujet):
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i  " % (idMessage, idSujet)
+        print(command)
+        cursor.execute(command)
+        db.commit()
+        db.close()
+
+    def supprimerSujetParID(self, idSujet):
+        print("SUpprimer", idSujet)
+        #Supprimer tous les messages de ce sujet
+        messages = self.searchMessages(idSujet)
+        if messages:
+            for message in messages:
+                self.supprimerMessageParID(message.id, idSujet)
+
+        #Supprimer le sujet
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        command = "DELETE FROM SUJET WHERE id = %i" % (idSujet)
+        print(command)
+        cursor.execute(command)
+        db.commit()
+        db.close()
+
 
     def connectionUser(self):
         pass
