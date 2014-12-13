@@ -57,7 +57,7 @@ class SujetVue():
         self.commandes.supprimerSujetParID(sujetASupprimer.id) # TODO: Le faire :D
         del self.sujets[indiceSujetListe] #Delete le sujet dans la liste
         self.boxSujet.delete(indiceSujetListe)
-        #TOD: REFRESH
+        #TOD: VRAI REFRESH ?
 
 class MessageVue():
     def __init__(self, n, commandes):
@@ -86,4 +86,5 @@ class MessageVue():
         messageAsupprimer = self.messages[indiceMessageListe]
         self.commandes.supprimerMessageParID(messageAsupprimer.id, self.id) # TODO: Prend l'id du sujet pour trouver le bon message
         del self.messages[indiceMessageListe] #Delete le message dans la liste
-        #TOD: REFRESH
+        self.message.delete(indiceMessageListe)
+        #TOD: VRAI REFRESH ? (Sujet aussi)
