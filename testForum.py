@@ -32,12 +32,12 @@ class Commandes():
 
         #POUR DES TESTS
         #INSERTION DE SUJETS
-        self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('LOL', '1776-7-4 04:13:54')", True)
-        self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('Pourquoi pas ? ', '1776-7-4 04:13:54')", True)
+        #self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('LOL', '1776-7-4 04:13:54')", True)
+        #self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('Pourquoi pas ? ', '1776-7-4 04:13:54')", True)
         #INSERTION DE MESSAGES
-        self.insererMessage("'LOL'", "'Premier insert'")
-        self.insererMessage("'LOL'", "'Deuxième insert'")
-        self.insererMessage("'Pourquoi pas ? '", "'Un autre message !!!'")
+        #self.insererMessage("'LOL'", "'Premier insert'")
+        #self.insererMessage("'LOL'", "'Deuxième insert'")
+        #self.insererMessage("'Pourquoi pas ? '", "'Un autre message !!!'")
         #idSujet = self.trouveIdSujet("'LOL'")
         #print("id",idSujet)
         #if idSujet:
@@ -69,9 +69,19 @@ class Commandes():
     def ajouteMessage(self, texte, idSujet):
         datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         datePresent = "'" + datePresent + "'"
+        texte = re.escape(texte)
+        print(texte)
         texte = "'" + texte + "'"
         if idSujet:
             self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date) VALUES(%s,%i,%s)"%(texte,idSujet,datePresent), True)
+
+    def ajouteSujet(self, nom):
+        datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        datePresent = "'" + datePresent + "'"
+        nom = re.escape(nom)
+        nom = "'" + nom + "'"
+        print(nom)
+        self.executeCommand("INSERT INTO SUJET(nom, date) VALUES(%s,%s)"%(nom,datePresent), True)
     
     def trouveIdSujet(self,nomSujet):
         try:
