@@ -130,7 +130,7 @@ class Commandes():
             print("i", _id,nom,date,dernier,parent)
             sujets.append(sujet)
         db.close()
-        print("sujets", sujets[0].id)
+
         return sujets
 
     def searchNbMessages(self,sujet):

@@ -46,15 +46,17 @@ class SujetVue():
 
     def remplirListe(self):
         self.boxSujet.delete(0, END)
-        sujets = self.commandes.searchSujets() #[Sujet(1, "Un", "hier", "2", "demain", None), Sujet(2, "Deux", "demain", "3", "hier", None)]
-        for sujet in sujets:
+        self.sujets = self.commandes.searchSujets() #[Sujet(1, "Un", "hier", "2", "demain", None), Sujet(2, "Deux", "demain", "3", "hier", None)]
+        for sujet in self.sujets:
             self.boxSujet.insert(END, ('Important Message: ' + sujet.nom, sujet.date, sujet.nbMessages))
 
     def visioner(self, event):
         MessageVue(event[0], self.commandes)
 
     def supprimer(self, event):
-        self.commandes.supprimerSujetParID(event[0]) # TODO: Le faire :D
+        indiceSujetListe = event[0]
+        sujetASupprimer = self.sujets[indiceSujetListe]
+        self.commandes.supprimerSujetParID(sujetASupprimer.id)
         self.remplirListe()
         
     def ajouter(self):
@@ -85,8 +87,8 @@ class MessageVue():
 
     def remplirListe(self):
         self.message.delete(0, END)
-        messages = self.commandes.searchMessages(self.id) #[Message(1, "Premier", "Jamais", "Moi", self.id, self.id), Message(2, "Second", "Toujours", "L'autre", self.id, self.id)]
-        for m in messages:
+        self.messages = self.commandes.searchMessages(self.id) #[Message(1, "Premier", "Jamais", "Moi", self.id, self.id), Message(2, "Second", "Toujours", "L'autre", self.id, self.id)]
+        for m in self.messages:
             self.message.insert(END,(m.texte, m.auteur, m.date))
 
     def ajouter(self):
@@ -101,5 +103,7 @@ class MessageVue():
         self.remplirListe()
 
     def supprimer(self, n):
-        self.commandes.supprimerMessageParID(event[0], self.id) # TODO: Prend l'id du sujet pour trouver le bon message
-        self.replirListe()
+        indiceMessageListe = n[0]
+        messageAsupprimer = self.messages[indiceMessageListe]
+        self.commandes.supprimerMessageParID(messageAsupprimer.id, self.id)
+        self.remplirListe()
