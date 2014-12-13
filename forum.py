@@ -62,13 +62,10 @@ class SujetVue():
         Label(nsujet, text="Titre").grid(column = 0, row = 0)
         titre = Entry(nsujet)
         titre.grid(column = 1, row = 0)
-        Label(nsujet, text="Sujet").grid(column = 0, row = 1)
-        sujet = Entry(nsujet)
-        sujet.grid(column = 1, row = 1)
-        Button(nsujet, text="Go", command=lambda:self.nouveau_sujet(nsujet, titre.get(), sujet.get())).grid()
+        Button(nsujet, text="Go", command=lambda:self.nouveau_sujet(nsujet, titre.get())).grid()
 
-    def nouveau_sujet(self, nsujet, titre, sujet):
-        self.commandes.ajouteSujet(titre, sujet)
+    def nouveau_sujet(self, nsujet, titre):
+        self.commandes.ajouteSujet(titre)
         nsujet.destroy()
         self.remplirListe()
         
