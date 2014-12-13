@@ -1,5 +1,6 @@
 import mysql.connector
 import re
+import datetime
 from forum import *
 
 nomDB = "FORUM"
@@ -57,11 +58,21 @@ class Commandes():
         db.close()
 
     def insererMessage(self, nomSujet, texte):
+        #POUR DES TESTS !
         idSujet = self.trouveIdSujet(nomSujet)
         print("id",idSujet)
+        datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        datePresent = "'" + datePresent + "'"
         if idSujet:
-            self.executeCommand("INSERT INTO MESSAGE(texte, sujet) VALUES(" + str(texte) + " , " + str(idSujet) + ")", True)
+            self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date) VALUES(%s,%i,%s)"%(texte,idSujet,datePresent), True)
 
+    def ajouteMessage(self, texte, idSujet):
+        datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        datePresent = "'" + datePresent + "'"
+        texte = "'" + texte + "'"
+        if idSujet:
+            self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date) VALUES(%s,%i,%s)"%(texte,idSujet,datePresent), True)
+    
     def trouveIdSujet(self,nomSujet):
         try:
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
