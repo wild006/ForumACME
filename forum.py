@@ -96,11 +96,11 @@ class MessageVue():
         achop = False
         result = ""
         for i in range(len(mess)):
+            if (i % 80) == 0:
+                achop = True
             if achop and mess.texte[i] == ' ':
                 result += '\n'
                 achop = False
-            if (i % 80) == 0:
-                achop = True
             result += mess.texte[i]
         return result
             
