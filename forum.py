@@ -55,7 +55,8 @@ class SujetVue():
 
     def supprimer(self, event):
         self.commandes.supprimerSujetParID(event[0]) # TODO: Le faire :D
-
+        self.remplirListe()
+        
     def ajouter(self):
         nsujet = Tk()
         Label(nsujet, text="Titre").grid(column = 0, row = 0)
