@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS MESSAGE(
 	texte varchar(1337),
 	date DATETIME,
 	reponse INTEGER REFERENCES MESSAGE(id),
-	user INTEGER REFERENCES USER(id),
+	user varchar(100),
 	sujet INTEGER REFERENCES SUJET(id),
 	PRIMARY KEY(id))ENGINE = innoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 	

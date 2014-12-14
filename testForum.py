@@ -66,14 +66,21 @@ class Commandes():
         if idSujet:
             self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date) VALUES(%s,%i,%s)"%(texte,idSujet,datePresent), True)
 
-    def ajouteMessage(self, texte, idSujet):
+    def ajouteMessage(self, texte, idSujet, user, messageRepondu):
+        if messageRepondu:
+            messageReponduId = messageRepondu.id
+        else:
+            messageReponduId = None
         datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         datePresent = "'" + datePresent + "'"
         texte = re.escape(texte)
         print(texte)
         texte = "'" + texte + "'"
-        if idSujet:
-            self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date) VALUES(%s,%i,%s)"%(texte,idSujet,datePresent), True)
+        user = "'" + user + "'"
+        if idSujet and messageReponduId:
+            self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date,user, reponse) VALUES(%s,%i,%s,%s, %i)"%(texte,idSujet,datePresent,user, messageReponduId), True)
+        elif not messageReponduId:
+            self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date,user) VALUES(%s,%i,%s,%s)"%(texte,idSujet,datePresent,user), True)
 
     def ajouteSujet(self, nom):
         datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -188,6 +195,15 @@ class Commandes():
             db.close()
             
         return 0
+
+    def searchMessageParID(self,idMessage):
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        command = "SELECT * FROM MESSAGE WHERE id = " + str(idMessage)
+        cursor.execute(command)
+        db.close()
+        result = cursor.fetchone()
+        return Message(result[0], result[1], result[2], result[3], result[4], result[5])
 
     def searchMessages(self, idSujet):
         try:

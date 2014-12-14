@@ -2,6 +2,8 @@
 
 from tkinter import *
 from multilistbox import *
+from testMessageCanvas import *
+import getpass
 
 class User():
     def __init__(self, _id, nom, prenom, username, passwd, mail):
@@ -39,7 +41,7 @@ class SujetVue():
         self.sujets = [] # Tous les sujets
         self.remplirListe()
         self.boxSujet.pack(expand=YES,fill=BOTH)
-
+        
         Button(self.forum, text="Visioner", command=lambda: self.visioner(self.boxSujet.curselection())).pack()
         Button(self.forum, text="Supprimer", command=lambda: self.supprimer(self.boxSujet.curselection())).pack()
         Button(self.forum, text="Ajouter", command=self.ajouter).pack()
@@ -76,25 +78,38 @@ class MessageVue():
         """Affiche les messages du sujet a l'id `n'"""
         self.commandes = commandes
         self.id = int(n)
-        self.mess = Toplevel(root)
+        self.forum = root
+        self.mess = Toplevel(self.forum)
 
         self.mess.title(self.commandes.trouveTitreSujetByID(self.id)) # Voir l'item du TODO
-
-        self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
-        self.message.pack(expand=YES, fill=BOTH)
+        self.messageGraphic = []
+        #self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
+        #self.message.pack(expand=YES, fill=BOTH)
         self.messages = [] # Tous les messages de la liste
-        self.remplirListe()
 
-        Button(self.mess, text="Ajouter", command=self.ajouter).pack()
-        Button(self.mess, text="Répondre", command=lambda: self.repondre(self.message.curselection()).pack()
-        Button(self.mess, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
+        #Mettre un canvas pour le scroll
+        scrollbar = Scrollbar(self.mess)
+        scrollbar.pack(side=RIGHT, fill=Y)
+        self.canevas = Canvas(self.mess, bd=0, highlightthickness=0,yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.canevas.yview)
+        self.canevas.pack()
+        self.m = self.canevas.create_window((0,0),window=PanedWindow(self.canevas,orient=VERTICAL),anchor='nw')
+        #self.m = PanedWindow(canevas,orient=VERTICAL)
+        self.remplirListe()
+        #self.m.pack()
+
+        Button(self.canevas, text="Ajouter", command=self.ajouter).pack()
+        #Button(self.canevas, text="Répondre", command=lambda: self.repondre(self.message.curselection())).pack()
+        #Button(self.canevas, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
+        
 
     def remplirListe(self):
-        self.message.delete(0, END)
+        #self.message.delete(0, END)
         self.messages = self.commandes.searchMessages(self.id) #[Message(1, "Premier", "Jamais", "Moi", self.id, self.id), Message(2, "Second", "Toujours", "L'autre", self.id, self.id)]
         for m in self.messages:
-            m.texte = self.chopMessage(m)
-            self.message.insert(END,(m.texte, m.auteur, m.date))
+            #m.texte = self.chopMessage(m)
+            self.messageGraphic.append(MesssageCanvas(self.canevas,self, m))
+            #self.message.insert(END,(m.texte, m.auteur, m.date))
 
     def chopMessage(self,mess):
         achop = False
@@ -115,19 +130,25 @@ class MessageVue():
         texte.pack()
         Button(nmess, text="Envoyer", command=lambda: self.nouveau_message(nmess, texte)).pack()
 
-    def nouveau_message(self, nmess, texte):
-        self.commandes.ajouteMessage(texte.get("1.0", END), self.id) # END ajoute un \n à la fin. On veut ça?
+    def nouveau_message(self, nmess, texte, messageRepondu = None):
+        self.commandes.ajouteMessage(texte.get("1.0", END), self.id, getpass.getuser(), messageRepondu) # END ajoute un \n à la fin. On veut ça?
         nmess.destroy()
+        for message in self.messageGraphic:
+            message.canevas.destroy()
+        self.messageGraphic = []
         self.remplirListe()
 
-    def supprimer(self, n):
-        indiceMessageListe = n[0]
-        messageAsupprimer = self.messages[indiceMessageListe]
+    def supprimer(self, messageAsupprimer):
+        #indiceMessageListe = n[0]
+        #messageAsupprimer = self.messages[indiceMessageListe]
         self.commandes.supprimerMessageParID(messageAsupprimer.id, self.id)
+        for message in self.messageGraphic:
+            message.canevas.destroy()
+        self.messageGraphic = []
         self.remplirListe()
 
-    def repondre(self, n):
-        indiceMessageListe = n[0]
-        messageArepondre = self.messages[indiceMessageListe]
-        message = self.commandes.getTexteMessageAvecAuteurAuDebutParID(messageArepondre) # C'est clair? Enfin, dans l'idée c'est ça.
-        self.ajouter(message)
+    def repondre(self, messageArepondre):
+        #indiceMessageListe = n[0]
+        #messageArepondre = self.messages[indiceMessageListe]
+        message = self.commandes.searchMessageParID(messageArepondre.id) # C'est clair? Enfin, dans l'idée c'est ça.
+        self.ajouter(message.texte)
