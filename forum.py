@@ -51,7 +51,7 @@ class SujetVue():
             self.boxSujet.insert(END, ('Important Message: ' + sujet.nom, sujet.date, sujet.nbMessages))
 
     def visioner(self, event):
-        MessageVue(event[0], self.commandes)
+        MessageVue(self.sujets[event[0]].id, self.commandes, self.forum)
 
     def supprimer(self, event):
         indiceSujetListe = event[0]
@@ -72,13 +72,13 @@ class SujetVue():
         self.remplirListe()
         
 class MessageVue():
-    def __init__(self, n, commandes):
+    def __init__(self, n, commandes, root):
         """Affiche les messages du sujet a l'id `n'"""
         self.commandes = commandes
-        self.id = int(n) + 1
-        self.mess = Tk()
+        self.id = int(n)
+        self.mess = Toplevel(root)
 
-        self.mess.title = self.commandes.trouveTitreSujetByID(self.id) # Voir l'item du TODO
+        self.mess.title(self.commandes.trouveTitreSujetByID(self.id)) # Voir l'item du TODO
 
         self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
         self.message.pack(expand=YES, fill=BOTH)
@@ -95,10 +95,10 @@ class MessageVue():
             m.texte = self.chopMessage(m)
             self.message.insert(END,(m.texte, m.auteur, m.date))
 
-    def chopMessage(mess):
+    def chopMessage(self,mess):
         achop = False
         result = ""
-        for i in range(len(mess)):
+        for i in range(len(mess.texte)):
             if (i % 80) == 0:
                 achop = True
             if achop and mess.texte[i] == ' ':
