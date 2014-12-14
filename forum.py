@@ -86,6 +86,7 @@ class MessageVue():
         self.remplirListe()
 
         Button(self.mess, text="Ajouter", command=self.ajouter).pack()
+        Button(self.mess, text="Répondre", command=lambda: self.repondre(self.message.curselection()).pack()
         Button(self.mess, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
 
     def remplirListe(self):
@@ -107,9 +108,10 @@ class MessageVue():
             result += mess.texte[i]
         return result
             
-    def ajouter(self):
+    def ajouter(self, message=""):
         nmess = Tk()
         texte = Text(nmess)
+        texte.insert(END, message)
         texte.pack()
         Button(nmess, text="Envoyer", command=lambda: self.nouveau_message(nmess, texte)).pack()
 
@@ -123,3 +125,9 @@ class MessageVue():
         messageAsupprimer = self.messages[indiceMessageListe]
         self.commandes.supprimerMessageParID(messageAsupprimer.id, self.id)
         self.remplirListe()
+
+    def repondre(self, n):
+        indiceMessageListe = n[0]
+        messageArepondre = self.messages[indiceMessageListe]
+        message = self.commandes.getTexteMessageAvecAuteurAuDebutParID(messageArepondre) # C'est clair? Enfin, dans l'idée c'est ça.
+        self.ajouter(message)

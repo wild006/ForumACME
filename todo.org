@@ -11,7 +11,10 @@
 * WAITING Mettre le user dans la BD quand on crée un message/sujet
   Voir point au dessus.
 * DONE Afficher l'auteur du message
-* TODO Pouvoir répondre à un message
+* WAITING Pouvoir répondre à un message
+  Faudrait coder dans la BD.
+  Et sinon faudrait construire une meilleure string.
+  Mais pour l'instant j'ai pas trop d'idée.
 * TODO Pouvoir faire un sujet enfant (voir la différence visuel) (Est* TODOce qu'on peut faire des messages dans des sujet parent ?)
 * TODO Pouvoir ordonné les messages par date/user
 * TODO Pouvoir ordonné les sujets par date/user
