@@ -113,7 +113,7 @@ class MessageVue():
         self.remplirListe()
         #self.m.pack()
         self.mess.bind_all("<MouseWheel>",self.scroll)
-        self.mess.bind_all('<ButtonRelease-1>',self.scroll)
+        self.yscrollbar.bind('<ButtonRelease-1>',self.scroll)
 
         Button(self.canevas, text="Ajouter", command=self.ajouter).pack()
         #Button(self.canevas, text="Répondre", command=lambda: self.repondre(self.message.curselection())).pack()
