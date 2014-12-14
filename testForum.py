@@ -99,6 +99,17 @@ class Commandes():
             db.close()
 
         return None
+
+    def trouveTitreSujetByID(self, idSujet):
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        command = "SELECT nom FROM SUJET WHERE id = %i" % (idSujet)
+        print(command)
+        cursor.execute(command)
+        nom = cursor.fetchone()
+        db.close()
+        print("nom", nom[0])
+        return nom[0]
     
     def executeScript(self,path,db):
         file = open(path, 'r')
