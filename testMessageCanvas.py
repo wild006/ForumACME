@@ -29,8 +29,8 @@ class MesssageCanvas():
         self.imageBoutonSupprimerTk = ImageTk.PhotoImage(image)
         self.imageBoutonSupprimer = self.canevas.create_image(650,130,anchor=NW,image=self.imageBoutonSupprimerTk, tags="boutonSupprimer")
 
-        self.canevas.tag_bind("boutonRepondre", '<ButtonPress-1>', self.repondre)
-        self.canevas.tag_bind("boutonSupprimer", '<ButtonPress-1>', self.supprimer)
+        self.canevas.tag_bind("boutonRepondre", '<ButtonRelease-1>', self.repondre)
+        self.canevas.tag_bind("boutonSupprimer", '<ButtonRelease-1>', self.supprimer)
 
     def repondre(self,event):
         print("repondre")

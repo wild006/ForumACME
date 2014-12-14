@@ -88,21 +88,41 @@ class MessageVue():
         self.messages = [] # Tous les messages de la liste
 
         #Mettre un canvas pour le scroll
-        scrollbar = Scrollbar(self.mess)
-        scrollbar.pack(side=RIGHT, fill=Y)
-        self.canevas = Canvas(self.mess, bd=0, highlightthickness=0,yscrollcommand=scrollbar.set)
-        scrollbar.config(command=self.canevas.yview)
-        self.canevas.pack()
-        self.m = self.canevas.create_window((0,0),window=PanedWindow(self.canevas,orient=VERTICAL),anchor='nw')
+        frame = Frame(self.mess, bd=2, relief=SUNKEN)
+
+        frame.grid_rowconfigure(0, weight=1)
+        frame.grid_columnconfigure(0, weight=1)
+
+        self.yscrollbar = Scrollbar(frame)
+        self.yscrollbar.grid(row=0, column=1, sticky=N+S)
+
+        self.canevas = Canvas(frame, bd=0, scrollregion=(0, 0, 1000, 1000),
+                yscrollcommand=self.yscrollbar.set)
+        self.canevas.grid(row=0, column=0, sticky=N+S+E+W)
+
+        self.yscrollbar.config(command=self.canevas.yview)
+
+        frame.pack()
+        #scrollbar = Scrollbar(self.mess)
+        #scrollbar.pack(side=RIGHT, fill=Y)
+        #self.canevas = Canvas(self.mess, bd=0, highlightthickness=0,yscrollcommand=scrollbar.set)
+        #scrollbar.config(command=self.canevas.yview)
+        #self.canevas.pack()
+        #self.m = self.canevas.create_window((0,0),window=PanedWindow(self.canevas,orient=VERTICAL),anchor='nw')
         #self.m = PanedWindow(canevas,orient=VERTICAL)
         self.remplirListe()
         #self.m.pack()
+        self.mess.bind_all("<MouseWheel>",self.scroll)
+        self.mess.bind_all('<ButtonRelease-1>',self.scroll)
 
         Button(self.canevas, text="Ajouter", command=self.ajouter).pack()
         #Button(self.canevas, text="Répondre", command=lambda: self.repondre(self.message.curselection())).pack()
         #Button(self.canevas, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
         
-
+    def scroll(self,event):
+        print("scroll", event.delta)
+        #self.yscrollbar.config(command=self.canevas.yview)
+    
     def remplirListe(self):
         #self.message.delete(0, END)
         self.messages = self.commandes.searchMessages(self.id) #[Message(1, "Premier", "Jamais", "Moi", self.id, self.id), Message(2, "Second", "Toujours", "L'autre", self.id, self.id)]
