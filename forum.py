@@ -111,7 +111,7 @@ class MessageVue():
         
         self.choixOrder = ('Date croisante', 'Date décroisant', 'Nom (A-Z)', 'Nom (Z-A)')
         self.listeOrder = ttk.Combobox(self.canevas,values = self.choixOrder, state = 'readonly')
-        self.listeOrder.set(self.choixOrder[0])
+        self.listeOrder.set(self.choixOrder[1])
         self.listeOrder.grid(row=0,column=0)
 
         self.searchField = AutocompleteEntry(self.commandes,self, self.canevas)
@@ -121,7 +121,6 @@ class MessageVue():
         self.listeSearch= ttk.Combobox(self.canevas,values = self.choixSearch, state = 'readonly')
         self.listeSearch.set(self.choixSearch[0])
         self.listeSearch.grid(row=0,column=2, sticky = E+W)
-       
         
         #self.panelHaut.pack()
 

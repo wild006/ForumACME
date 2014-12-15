@@ -207,7 +207,7 @@ class Commandes():
         result = cursor.fetchone()
         return Message(result[0], result[1], result[2], result[3], result[4], result[5])
 
-    def searchMessages(self, idSujet, orderById = 'Date croisante'):
+    def searchMessages(self, idSujet, orderById = 'Date décroisant'):
         if True:
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             orderByClause = self.orderByValue[orderById]
