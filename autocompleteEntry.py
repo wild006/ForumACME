@@ -3,9 +3,10 @@ import re
 
 
 class AutocompleteEntry(Entry):
-    def __init__(self, commandes, *args, **kwargs):
+    def __init__(self, commandes, messageVue, *args, **kwargs):
         self.parent = args[0]
         self.commandes = commandes
+        self.messageVue = messageVue
         Entry.__init__(self, *args, **kwargs)
         
         self.var = self["textvariable"]
@@ -85,7 +86,7 @@ class AutocompleteEntry(Entry):
     #    return [w for w in self.lista if re.match(pattern, w)]
 
     def comparisonBD(self):
-        return self.commandes.searchText(self.var.get())
+        return self.commandes.searchTextMessage(self.var.get(), self.messageVue.id, self.messageVue.listeSearch.get())
 
 if __name__ == '__main__':
     root = Tk()

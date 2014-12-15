@@ -114,7 +114,7 @@ class MessageVue():
         self.listeOrder.set(self.choixOrder[0])
         self.listeOrder.grid(row=0,column=0)
 
-        self.searchField = AutocompleteEntry(self.commandes,self.canevas)
+        self.searchField = AutocompleteEntry(self.commandes,self, self.canevas)
         self.searchField.grid(row=0,column=1, sticky = W+E)
         
         self.choixSearch = ('Message contenant', 'Message commençant par')
