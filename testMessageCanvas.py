@@ -4,7 +4,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 
 class MesssageCanvas():
-    def __init__(self,parent,messageVue, message):
+    def __init__(self, parent, messageVue, message):
         self.parent = parent #root
         self.message = message
         self.messageVue = messageVue

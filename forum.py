@@ -96,20 +96,19 @@ class MessageVue():
         
     def setTopLevel(self, root):
         self.mess = Toplevel(root, width=100, height=100)
-
-        self.mess.title(self.commandes.trouveTitreSujetByID(self.id)) # Voir l'item du TODO
+        self.mess.title(self.commandes.trouveTitreSujetByID(self.id))
         
     def setCanevas(self):
         self.yscrollbar = Scrollbar(self.mess)
         self.yscrollbar.grid(row=0, column=1, sticky=N+S)
 
-        self.canevas = Canvas(self.mess, bd=0, scrollregion=(0, 0, 1000, 1000), width=100, height=100, yscrollcommand=self.yscrollbar.set)
+        self.canevas = Canvas(self.mess, bd=0, scrollregion=(0, 0, 100, 100), width=100, height=100, yscrollcommand=self.yscrollbar.set)
         self.canevas.grid(row=0, column=0)
 
         self.yscrollbar.config(command=self.canevas.yview)
 
     def setSearchPanel(self):
-        self.panelHaut = PanedWindow(self.canevas,orient=HORIZONTAL)
+        self.panelHaut = PanedWindow(self.canevas,orient=HORIZONTAL, width=100, height=100)
         self.canevas.create_window((0,0),window=self.panelHaut,anchor='nw', tags="panelHaut")
         
         self.choixOrder = ('Date croisante', 'Date décroisant', 'Nom (A-Z)', 'Nom (Z-A)')
@@ -125,7 +124,7 @@ class MessageVue():
 
     def setMessPanel(self):
         self.m = PanedWindow(self.canevas,orient=VERTICAL, width=100, height=100)
-        self.canevas.create_window((0,0), window=self.m,anchor='nw', tags="panelMessage")
+        self.canevas.create_window((0,0), window=self.m,anchor='nw', tags="panelMessage", height=100, width=100)
         self.m.pack()
         self.remplirListe()
         
@@ -140,7 +139,7 @@ class MessageVue():
         self.searchField.bind('<Key>', self.onSearchField)
         
         Button(self.canevas, text="Ajouter", command=self.ajouter).pack()
-
+        
     def bouge(self, type, amount, what=None):
         print("YEP", type, amount, what)
         if what:
@@ -149,6 +148,7 @@ class MessageVue():
             self.canevas.yview(type, amount)
 
     def scroll(self, event):
+        # print(event.delta)
         self.canevas.yview(SCROLL, event.delta, "units")
         
     def onComboBox(self, event): #event
@@ -170,7 +170,7 @@ class MessageVue():
         self.messages = self.commandes.searchMessages(self.id,self.listeOrder.get() )
         for m in self.messages:
             #m.texte = self.chopMessage(m)
-            self.messageGraphic.append(MesssageCanvas(self.m,self, m))
+            self.messageGraphic.append(MesssageCanvas(self.m, self, m))
             #self.message.insert(END,(m.texte, m.auteur, m.date))
 
     def chopMessage(self,mess):
