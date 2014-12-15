@@ -103,7 +103,7 @@ class MessageVue():
         self.yscrollbar.grid(row=0, column=1, sticky=N+S)
 
         self.canevas = Canvas(self.mess, bd=0, scrollregion=(0, 0, 100, 100), width=100, height=100, yscrollcommand=self.yscrollbar.set)
-        self.canevas.grid(row=0, column=0)
+        self.canevas.grid(row=0, column=0, sticky=W+E+N+S)
 
         self.yscrollbar.config(command=self.canevas.yview)
 
@@ -136,9 +136,9 @@ class MessageVue():
         self.yscrollbar.bind('<ButtonRelease-1>',self.scroll)
         
         self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
-        self.searchField.bind('<Key>', self.onSearchField)
+        #self.searchField.bind('<Key>', self.onSearchField)
         
-        Button(self.canevas, text="Ajouter", command=self.ajouter).pack()
+        Button(self.canevas, text="Ajouter", command=self.ajouter).grid(row=2,column=2, sticky=W)
         
     def bouge(self, type, amount, what=None):
         print("YEP", type, amount, what)
@@ -155,11 +155,11 @@ class MessageVue():
         print("combo", event, self.listeOrder.get())
         self.remplirListe()
 
-    def onSearchField(self, event): #event
-        print("key", event.char)
+    #def onSearchField(self, event): #event
+        #print("key", event.char)
         #self.searchField
-        self.canevas.tag_raise("panelHaut")
-        self.canevas.tag_lower("panelMessage")
+        #self.canevas.tag_raise("panelHaut")
+        #self.canevas.tag_lower("panelMessage")
     
     def remplirListe(self):
         #Delete messages

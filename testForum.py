@@ -13,6 +13,7 @@ class Commandes():
         self.host = "127.0.0.1"
         self.nomDB = "FORUM"
         self.orderByValue = {'Date croisante':"date ASC ", 'Date décroisant':"date DESC", 'Nom (A-Z)':"user ASC", 'Nom (Z-A)':"user DESC"}
+        self.searchTypeValue = {'Message contenant':1, 'Message commençant par':2}
         self.startUp()
         self.v = SujetVue(self)
         self.v.forum.mainloop()
@@ -207,7 +208,7 @@ class Commandes():
         result = cursor.fetchone()
         return Message(result[0], result[1], result[2], result[3], result[4], result[5])
 
-    def searchMessages(self, idSujet, orderById = 'Date croisante'):
+    def searchMessages(self, idSujet, orderById = 'Date décroisant'):
         if True:
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             orderByClause = self.orderByValue[orderById]
@@ -225,13 +226,12 @@ class Commandes():
         db.close()
         return messages
 
-    def searchText(self,letters):
+    def searchTextMessage(self,letters,idSujet, typeSearch = 'Message contenant'):
         try:
-            letters = "'%" + letters + "%'"
-            print(letters)
+            letters = self.formatTextSearch(self.searchTypeValue[typeSearch], letters)
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
-            command = "SELECT * FROM MESSAGE WHERE texte LIKE " + letters
+            command = "SELECT * FROM MESSAGE WHERE sujet = %i  AND texte LIKE %s" % (idSujet, letters)
             cursor.execute(command)
             db.close()
         except:
@@ -245,6 +245,14 @@ class Commandes():
             messages.append(message)
         print(len(messages))
         return messages
+
+    def formatTextSearch(self, idTypeSearch, texte):
+        if idTypeSearch == 1:
+            texte = "'%" + texte + "%'"
+        elif idTypeSearch == 2:
+            texte = "'" + texte + "%'"
+
+        return texte
 
     def supprimerMessageParID(self, idMessage, idSujet):
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
