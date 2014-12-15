@@ -209,7 +209,7 @@ class Commandes():
         cursor.execute(command)
         db.close()
         result = cursor.fetchone()
-        return Message(result[0], result[1], result[2], result[3], result[4], result[5])
+        return Message(result[0], result[1], result[2], result[4], result[3], result[5])
 
     def searchMessages(self, idSujet, orderById = 'Date décroisant'):
         if True:

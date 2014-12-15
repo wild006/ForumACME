@@ -246,5 +246,13 @@ class MessageVue():
     def repondre(self, messageArepondre):
         #indiceMessageListe = n[0]
         #messageArepondre = self.messages[indiceMessageListe]
-        message = self.commandes.searchMessageParID(messageArepondre.id) # C'est clair? Enfin, dans l'idée c'est ça.
-        self.ajouter(message.texte)
+        message = self.commandes.searchMessageParID(messageArepondre.id)
+        rep = ""
+        print(message.auteur)
+        rep += message.auteur + " à dit: \n> "
+        for c in message.texte:
+            rep += c
+            if c == '\n':
+                rep += "> "
+        rep += "\n\n"
+        self.ajouter(rep)
