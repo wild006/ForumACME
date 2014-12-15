@@ -42,17 +42,35 @@ class SujetVue():
         self.boxSujet = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Nombre de messages', 10)))
         self.sujets = [] # Tous les sujets
         self.remplirListe()
-        self.boxSujet.pack(expand=YES,fill=BOTH)
+        self.boxSujet.grid(row=1,column=0,sticky = E+W+N+S, columnspan=3)
+        self.setSearchPanel()
         
-        Button(self.forum, text="Visioner", command=lambda: self.visioner(self.boxSujet.curselection())).pack()
-        Button(self.forum, text="Supprimer", command=lambda: self.supprimer(self.boxSujet.curselection())).pack()
-        Button(self.forum, text="Ajouter", command=self.ajouter).pack()
+        Button(self.forum, text="Visioner", command=lambda: self.visioner(self.boxSujet.curselection())).grid(row=2,column=0)
+        Button(self.forum, text="Supprimer", command=lambda: self.supprimer(self.boxSujet.curselection())).grid(row=2,column=1)
+        Button(self.forum, text="Ajouter", command=self.ajouter).grid(row=2,column=2)
+
+    def setSearchPanel(self):        
+        self.choixOrder = ('Date croisante', 'Date décroisant', 'Auteur (A-Z)', 'Auteur (Z-A)', 'Nom sujet (A-Z)','Nom sujet (Z-A)')
+        self.listeOrder = ttk.Combobox(self.forum,values = self.choixOrder, state = 'readonly')
+        self.listeOrder.set(self.choixOrder[1])
+        self.listeOrder.grid(row=0,column=0)
+        
+        self.searchField = AutocompleteEntry(self.commandes,self, self.forum)
+        self.searchField.grid(row=0,column=1, sticky = W+E)
+        
+        self.choixSearch = ('Sujet contenant', 'Sujet commençant par', 'Message contenant', 'Message commençant par')
+        self.listeSearch= ttk.Combobox(self.forum,values = self.choixSearch, state = 'readonly')
+        self.listeSearch.set(self.choixSearch[0])
+        self.listeSearch.grid(row=0,column=2, sticky = E+W)
 
     def remplirListe(self):
         self.boxSujet.delete(0, END)
         self.sujets = self.commandes.searchSujets() #[Sujet(1, "Un", "hier", "2", "demain", None), Sujet(2, "Deux", "demain", "3", "hier", None)]
         for sujet in self.sujets:
             self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages))
+
+    def onSearchComparaison(self,texte):
+        return self.commandes.searchTextSujet(texte, self.listeSearch.get())
 
     def visioner(self, event):
         MessageVue(self.sujets[int(event[0])].id, self.commandes, self.forum)
@@ -114,7 +132,7 @@ class MessageVue():
         self.frame.pack()
 
     def setSearchPanel(self):        
-        self.choixOrder = ('Date croisante', 'Date décroisant', 'Nom (A-Z)', 'Nom (Z-A)')
+        self.choixOrder = ('Date croisante', 'Date décroisant', 'Auteur (A-Z)', 'Auteur (Z-A)')
         self.listeOrder = ttk.Combobox(self.canevas,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
         self.listeOrder.grid(row=0,column=0)
@@ -164,6 +182,9 @@ class MessageVue():
     def onComboBox(self, event): #event
         print("combo", event, self.listeOrder.get())
         self.remplirListe()
+
+    def onSearchComparaison(self,texte):
+        return self.commandes.searchTextMessage(texte, self.id, self.listeSearch.get())
 
     #def onSearchField(self, event): #event
         #print("key", event.char)

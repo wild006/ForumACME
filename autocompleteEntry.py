@@ -3,10 +3,10 @@ import re
 
 
 class AutocompleteEntry(Entry):
-    def __init__(self, commandes, messageVue, *args, **kwargs):
+    def __init__(self, commandes, vue, *args, **kwargs):
         self.parent = args[0]
         self.commandes = commandes
-        self.messageVue = messageVue
+        self.vue = vue #message ou sujet
         Entry.__init__(self, *args, **kwargs)
         
         self.var = self["textvariable"]
@@ -40,14 +40,17 @@ class AutocompleteEntry(Entry):
                 self.lb.delete(0, END)
                 for w in self.words:
                     print(w)
-                    self.lb.insert(END,w.texte)
+                    try:
+                        self.lb.insert(END,w.texte) #message
+                    except:
+                        self.lb.insert(END,w.nom) #sujet
             else:
                 if self.lb_up:
                     self.lb.destroy()
                     self.lb_up = False
         
     def selection(self, event):
-        print(event, self.words[self.lb.curselection()[0]].texte)
+        #print(event, self.words[self.lb.curselection()[0]].texte)
         messageChoisi = self.words[self.lb.curselection()[0]]
         if self.lb_up:
             self.var.set(self.lb.get(ACTIVE))
@@ -86,7 +89,7 @@ class AutocompleteEntry(Entry):
     #    return [w for w in self.lista if re.match(pattern, w)]
 
     def comparisonBD(self):
-        return self.commandes.searchTextMessage(self.var.get(), self.messageVue.id, self.messageVue.listeSearch.get())
+        return self.vue.onSearchComparaison(self.var.get())
 
 if __name__ == '__main__':
     root = Tk()

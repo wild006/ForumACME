@@ -12,8 +12,8 @@ class Commandes():
         self.passwd = "AAAaaa111"
         self.host = "127.0.0.1"
         self.nomDB = "FORUM"
-        self.orderByValue = {'Date croisante':"date ASC ", 'Date décroisant':"date DESC", 'Nom (A-Z)':"user ASC", 'Nom (Z-A)':"user DESC"}
-        self.searchTypeValue = {'Message contenant':1, 'Message commençant par':2}
+        self.orderByValue = {'Date croisante':"date ASC ", 'Date décroisant':"date DESC", 'Auteur (A-Z)':"user ASC", 'Auteur (Z-A)':"user DESC"}
+        self.searchTypeValue = {'Message contenant':1, 'Message commençant par':2,'Sujet contenant':3, 'Sujet commençant par':4}
         self.startUp()
         self.v = SujetVue(self)
         self.v.forum.mainloop()
@@ -226,12 +226,43 @@ class Commandes():
         db.close()
         return messages
 
+    def searchTextSujet(self,letters, typeSearch = 'Message contenant'):
+        idTypeSearch = self.searchTypeValue[typeSearch]
+        if idTypeSearch == 1 or idTypeSearch == 2: #Messages
+            return self.searchTextMessage(letters, None, typeSearch)
+        
+        try:
+            letters = self.formatTextSearch(idTypeSearch, letters)
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            cursor = db.cursor()
+            command = "SELECT * FROM SUJET WHERE nom LIKE %s" % (letters)
+            cursor.execute(command)
+            db.close()
+        except:
+            db.close()
+            return [] #Pas trouvé
+
+        sujets = []
+
+        for (_id, nom, date, dernier,parent) in cursor:
+            nbMessages = self.searchNbMessages("'" + nom + "'")
+            sujet = Sujet(_id,nom,date,nbMessages,dernier,parent)
+            print("i", _id,nom,date,dernier,parent)
+            sujets.append(sujet)
+
+        return sujets
+
     def searchTextMessage(self,letters,idSujet, typeSearch = 'Message contenant'):
         try:
+            if idSujet:
+                sujetSearch = "sujet = %i  AND " % (idSujet) #les messages d'un sujet
+            else:
+                sujetSearch = " " #Tous les messages
+                
             letters = self.formatTextSearch(self.searchTypeValue[typeSearch], letters)
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
-            command = "SELECT * FROM MESSAGE WHERE sujet = %i  AND texte LIKE %s" % (idSujet, letters)
+            command = "SELECT * FROM MESSAGE WHERE %s texte LIKE %s" % (sujetSearch, letters)
             cursor.execute(command)
             db.close()
         except:
@@ -247,9 +278,9 @@ class Commandes():
         return messages
 
     def formatTextSearch(self, idTypeSearch, texte):
-        if idTypeSearch == 1:
+        if idTypeSearch == 1 or idTypeSearch == 3:
             texte = "'%" + texte + "%'"
-        elif idTypeSearch == 2:
+        elif idTypeSearch == 2 or idTypeSearch == 4:
             texte = "'" + texte + "%'"
 
         return texte
