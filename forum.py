@@ -94,7 +94,7 @@ class MessageVue():
         self.setMessPanel()
         self.setEvents()
         
-    def setTopLevel(self, root)
+    def setTopLevel(self, root):
         self.mess = Toplevel(root, width=100, height=100)
 
         self.mess.title(self.commandes.trouveTitreSujetByID(self.id)) # Voir l'item du TODO
