@@ -3,6 +3,7 @@
 from tkinter import *
 import tkinter.ttk  as ttk #Pour le combo Box
 from multilistbox import *
+from autocompleteEntry import *
 from testMessageCanvas import *
 import getpass
 
@@ -105,10 +106,21 @@ class MessageVue():
 
         frame.pack()
         # Choix du Order by
+        self.panelHaut = PanedWindow(self.canevas,orient=HORIZONTAL)
+        self.canevas.create_window((0,0),window=self.panelHaut,anchor='nw', tags="panelHaut")
+        
         self.choixOrder = ('Date croisante', 'Date décroisant', 'Nom (A-Z)', 'Nom (Z-A)')
-        self.listeOrder = ttk.Combobox(self.canevas,values = self.choixOrder, state = 'readonly')
+        self.listeOrder = ttk.Combobox(self.panelHaut,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
-        self.listeOrder.pack()
+        self.listeOrder.pack(side=RIGHT)
+
+        #self.searchField = Entry(self.panelHaut)
+        self.searchField = AutocompleteEntry(self.commandes, self.canevas)
+       
+        
+        self.panelHaut.pack()
+
+        self.searchField.pack()
         
         #scrollbar = Scrollbar(self.mess)
         #scrollbar.pack(side=RIGHT, fill=Y)
@@ -117,15 +129,18 @@ class MessageVue():
         #self.canevas.pack()
         #self.m = self.canevas.create_window((0,0),window=PanedWindow(self.canevas,orient=VERTICAL),anchor='nw')
         self.m = PanedWindow(self.canevas,orient=VERTICAL)
+        self.canevas.create_window((0,0),window=self.m,anchor='nw', tags="panelMessage")
         self.m.pack()
         self.remplirListe()
         #self.m.pack()
-
+        self.canevas.tag_raise("panelHaut")
+        self.canevas.tag_lower("panelMessage")
         #events
         self.mess.bind_all("<MouseWheel>",self.scroll)
         self.yscrollbar.bind('<ButtonRelease-1>',self.scroll)
         self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
-
+        self.searchField.bind('<Key>', self.onSearchField)
+        
         Button(self.canevas, text="Ajouter", command=self.ajouter).pack()
         #Button(self.canevas, text="Répondre", command=lambda: self.repondre(self.message.curselection())).pack()
         #Button(self.canevas, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
@@ -136,7 +151,13 @@ class MessageVue():
 
     def onComboBox(self, event): #event
         print("combo", event, self.listeOrder.get())
-        self.remplirListe()              
+        self.remplirListe()
+
+    def onSearchField(self, event): #event
+        print("key", event.char)
+        #self.searchField
+        self.canevas.tag_raise("panelHaut")
+        self.canevas.tag_lower("panelMessage")
     
     def remplirListe(self):
         #Delete messages

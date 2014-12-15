@@ -224,6 +224,27 @@ class Commandes():
         db.close()
         return messages
 
+    def searchText(self,letters):
+        try:
+            letters = "'%" + letters + "%'"
+            print(letters)
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            cursor = db.cursor()
+            command = "SELECT * FROM MESSAGE WHERE texte LIKE " + letters
+            cursor.execute(command)
+            db.close()
+        except:
+            db.close()
+            return [] #Pas trouvé
+
+        messages = []
+        
+        for (_id, text, date, reponse,user,sujet) in cursor:
+            message = Message(_id,text,date,user,reponse, sujet)
+            messages.append(message)
+        print(len(messages))
+        return messages
+
     def supprimerMessageParID(self, idMessage, idSujet):
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
