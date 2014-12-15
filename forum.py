@@ -80,14 +80,26 @@ class MessageVue():
         """Affiche les messages du sujet a l'id `n'"""
         self.commandes = commandes
         self.id = int(n)
-        self.forum = root
-        self.mess = Toplevel(self.forum, width=100, height=100)
+        
+        self.messageGraphic = []
+        self.messages = [] # Tous les messages de la liste
+        
+        self.initVue(root)
+
+        
+    def initVue(self, root):
+        self.setTopLevel(root)
+        self.setCanevas()
+        self.setSearchPanel()
+        self.setMessPanel()
+        self.setEvents()
+        
+    def setTopLevel(self, root)
+        self.mess = Toplevel(root, width=100, height=100)
 
         self.mess.title(self.commandes.trouveTitreSujetByID(self.id)) # Voir l'item du TODO
-        self.messageGraphic = []
-
-        self.messages = [] # Tous les messages de la liste
-
+        
+    def setCanevas(self):
         self.yscrollbar = Scrollbar(self.mess)
         self.yscrollbar.grid(row=0, column=1, sticky=N+S)
 
@@ -96,7 +108,7 @@ class MessageVue():
 
         self.yscrollbar.config(command=self.canevas.yview)
 
-        # Choix du Order by
+    def setSearchPanel(self):
         self.panelHaut = PanedWindow(self.canevas,orient=HORIZONTAL)
         self.canevas.create_window((0,0),window=self.panelHaut,anchor='nw', tags="panelHaut")
         
@@ -104,29 +116,23 @@ class MessageVue():
         self.listeOrder = ttk.Combobox(self.panelHaut,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
         self.listeOrder.pack(side=RIGHT)
-
-        #self.searchField = Entry(self.panelHaut)
+        
         self.searchField = AutocompleteEntry(self.commandes, self.canevas)
        
-        
         self.panelHaut.pack()
 
         self.searchField.pack()
-        
-        #scrollbar = Scrollbar(self.mess)
-        #scrollbar.pack(side=RIGHT, fill=Y)
-        #self.canevas = Canvas(self.mess, bd=0, highlightthickness=0,yscrollcommand=scrollbar.set)
-        #scrollbar.config(command=self.canevas.yview)
-        #self.canevas.pack()
-        #self.m = self.canevas.create_window((0,0),window=PanedWindow(self.canevas,orient=VERTICAL),anchor='nw')
+
+    def setMessPanel(self):
         self.m = PanedWindow(self.canevas,orient=VERTICAL, width=100, height=100)
         self.canevas.create_window((0,0), window=self.m,anchor='nw', tags="panelMessage")
         self.m.pack()
         self.remplirListe()
-        #self.m.pack()
+        
         self.canevas.tag_raise("panelHaut")
         self.canevas.tag_lower("panelMessage")
-        #events
+
+    def setEvents(self):
         self.mess.bind_all("<MouseWheel>",self.scroll)
         self.yscrollbar.bind('<ButtonRelease-1>',self.scroll)
         
