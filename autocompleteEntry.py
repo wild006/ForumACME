@@ -23,10 +23,12 @@ class AutocompleteEntry(Entry):
     def changed(self, name, index, mode):  
 
         if self.var.get() == '':
-            self.lb.destroy()
-            self.lb_up = False
+            try:
+                self.lb.destroy()
+                self.lb_up = False
+            except:
+                pass # lb n'existe pas encore
         else:
-            #words = self.comparison()
             self.words = self.comparisonBD()
             print(self.words)
             if self.words:

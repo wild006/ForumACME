@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS MESSAGE(
 	reponse INTEGER REFERENCES MESSAGE(id),
 	user varchar(100),
 	sujet INTEGER REFERENCES SUJET(id),
-	PRIMARY KEY(id))ENGINE = innoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
+	PRIMARY KEY(id),
+	FULLTEXT (texte))ENGINE = innoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 	
 	
 	
