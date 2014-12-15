@@ -91,7 +91,7 @@ class SujetVue():
         Button(nsujet, text="Go", command=lambda:self.nouveau_sujet(nsujet, titre.get())).grid()
 
     def nouveau_sujet(self, nsujet, titre):
-        self.commandes.ajouteSujet(titre)
+        self.commandes.ajouteSujet(titre, getpass.getuser())
         nsujet.destroy()
         self.remplirListe()
 

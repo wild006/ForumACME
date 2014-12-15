@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS SUJET(
 	id INTEGER NOT NULL AUTO_INCREMENT, 
 	nom varchar(50), 
 	date DATETIME, 
-	user INTEGER REFERENCES USER(id), 
+	user varchar(100), 
 	parent INTEGER REFERENCES SUJET(id), 
 	PRIMARY KEY ( id ))ENGINE = innoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 	

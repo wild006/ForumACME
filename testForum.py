@@ -85,13 +85,14 @@ class Commandes():
         elif not messageReponduId:
             self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date,user) VALUES(%s,%i,%s,%s)"%(texte,idSujet,datePresent,user), True)
 
-    def ajouteSujet(self, nom):
+    def ajouteSujet(self, nom, user):
         datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         datePresent = "'" + datePresent + "'"
         nom = re.escape(nom)
         nom = "'" + nom + "'"
+        user = "'" + user + "'"
         print(nom)
-        self.executeCommand("INSERT INTO SUJET(nom, date) VALUES(%s,%s)"%(nom,datePresent), True)
+        self.executeCommand("INSERT INTO SUJET(nom, date, user) VALUES(%s,%s, %s)"%(nom,datePresent, user), True)
     
     def trouveIdSujet(self,nomSujet):
         try:
