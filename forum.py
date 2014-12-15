@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from tkinter import *
+import tkinter.ttk  as ttk #Pour le combo Box
 from multilistbox import *
 from testMessageCanvas import *
 import getpass
@@ -103,32 +104,50 @@ class MessageVue():
         self.yscrollbar.config(command=self.canevas.yview)
 
         frame.pack()
+        # Choix du Order by
+        self.choixOrder = ('Date croisante', 'Date décroisant', 'Nom (A-Z)', 'Nom (Z-A)')
+        self.listeOrder = ttk.Combobox(self.canevas,values = self.choixOrder, state = 'readonly')
+        self.listeOrder.set(self.choixOrder[0])
+        self.listeOrder.pack()
+        
         #scrollbar = Scrollbar(self.mess)
         #scrollbar.pack(side=RIGHT, fill=Y)
         #self.canevas = Canvas(self.mess, bd=0, highlightthickness=0,yscrollcommand=scrollbar.set)
         #scrollbar.config(command=self.canevas.yview)
         #self.canevas.pack()
         #self.m = self.canevas.create_window((0,0),window=PanedWindow(self.canevas,orient=VERTICAL),anchor='nw')
-        #self.m = PanedWindow(canevas,orient=VERTICAL)
+        self.m = PanedWindow(self.canevas,orient=VERTICAL)
+        self.m.pack()
         self.remplirListe()
         #self.m.pack()
+
+        #events
         self.mess.bind_all("<MouseWheel>",self.scroll)
         self.yscrollbar.bind('<ButtonRelease-1>',self.scroll)
+        self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
 
         Button(self.canevas, text="Ajouter", command=self.ajouter).pack()
         #Button(self.canevas, text="Répondre", command=lambda: self.repondre(self.message.curselection())).pack()
         #Button(self.canevas, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
         
-    def scroll(self,event):
+    def scroll(self,event): #event
         print("scroll", event.delta)
         #self.yscrollbar.config(command=self.canevas.yview)
+
+    def onComboBox(self, event): #event
+        print("combo", event, self.listeOrder.get())
+        self.remplirListe()              
     
     def remplirListe(self):
-        #self.message.delete(0, END)
-        self.messages = self.commandes.searchMessages(self.id) #[Message(1, "Premier", "Jamais", "Moi", self.id, self.id), Message(2, "Second", "Toujours", "L'autre", self.id, self.id)]
+        #Delete messages
+        for message in self.messageGraphic:
+            message.canevas.destroy()
+        self.messageGraphic = []
+        
+        self.messages = self.commandes.searchMessages(self.id,self.listeOrder.get() ) #[Message(1, "Premier", "Jamais", "Moi", self.id, self.id), Message(2, "Second", "Toujours", "L'autre", self.id, self.id)]
         for m in self.messages:
             #m.texte = self.chopMessage(m)
-            self.messageGraphic.append(MesssageCanvas(self.canevas,self, m))
+            self.messageGraphic.append(MesssageCanvas(self.m,self, m))
             #self.message.insert(END,(m.texte, m.auteur, m.date))
 
     def chopMessage(self,mess):
@@ -153,18 +172,12 @@ class MessageVue():
     def nouveau_message(self, nmess, texte, messageRepondu = None):
         self.commandes.ajouteMessage(texte.get("1.0", END), self.id, getpass.getuser(), messageRepondu) # END ajoute un \n à la fin. On veut ça?
         nmess.destroy()
-        for message in self.messageGraphic:
-            message.canevas.destroy()
-        self.messageGraphic = []
         self.remplirListe()
 
     def supprimer(self, messageAsupprimer):
         #indiceMessageListe = n[0]
         #messageAsupprimer = self.messages[indiceMessageListe]
         self.commandes.supprimerMessageParID(messageAsupprimer.id, self.id)
-        for message in self.messageGraphic:
-            message.canevas.destroy()
-        self.messageGraphic = []
         self.remplirListe()
 
     def repondre(self, messageArepondre):

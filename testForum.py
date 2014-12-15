@@ -11,6 +11,7 @@ class Commandes():
         self.passwd = "AAAaaa111"
         self.host = "127.0.0.1"
         self.nomDB = "FORUM"
+        self.orderByValue = {'Date croisante':"date ASC ", 'Date décroisant':"date DESC", 'Nom (A-Z)':"user ASC", 'Nom (Z-A)':"user DESC"}
         self.startUp()
         self.v = SujetVue(self)
         self.v.forum.mainloop()
@@ -205,13 +206,14 @@ class Commandes():
         result = cursor.fetchone()
         return Message(result[0], result[1], result[2], result[3], result[4], result[5])
 
-    def searchMessages(self, idSujet):
-        try:
+    def searchMessages(self, idSujet, orderById = 'Date croisante'):
+        if True:
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            orderByClause = self.orderByValue[orderById]
             cursor = db.cursor()
-            command = "SELECT * FROM MESSAGE WHERE sujet = " + str(idSujet)
+            command = "SELECT * FROM MESSAGE WHERE sujet = %i ORDER BY %s" % (idSujet,orderByClause)
             cursor.execute(command)
-        except:
+        else:
             db.close()
 
         messages = []
