@@ -12,7 +12,7 @@ class Commandes():
         self.passwd = "AAAaaa111"
         self.host = "127.0.0.1"
         self.nomDB = "FORUM"
-        self.orderByValue = {'Date croisante':"date ASC ", 'Date décroisant':"date DESC", 'Auteur (A-Z)':"user ASC", 'Auteur (Z-A)':"user DESC"}
+        self.orderByValue = {'Date croisante':"date ASC ", 'Date décroisant':"date DESC", 'Auteur (A-Z)':"user ASC", 'Auteur (Z-A)':"user DESC", 'Nom sujet (A-Z)':"nom ASC",'Nom sujet (Z-A)':"nom DESC"}
         self.searchTypeValue = {'Message contenant':1, 'Message commençant par':2,'Sujet contenant':3, 'Sujet commençant par':4}
         self.startUp()
         self.v = SujetVue(self)
@@ -153,12 +153,14 @@ class Commandes():
         except:
             print("pas trouvé")
 
-    def searchSujets(self):
+    def searchSujets(self, orderById = 'Date croisante'):
         cursor = -1 #Pas trouvé
         try:
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
-            command = "SELECT * FROM SUJET"
+            orderByClause = self.orderByValue[orderById]
+            print(orderByClause)
+            command = "SELECT * FROM SUJET ORDER BY %s" %(orderByClause)
             print(command)
             cursor.execute(command)
             print("cursor", cursor)

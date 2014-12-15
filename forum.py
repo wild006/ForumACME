@@ -41,9 +41,11 @@ class SujetVue():
         
         self.boxSujet = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Nombre de messages', 10)))
         self.sujets = [] # Tous les sujets
-        self.remplirListe()
+        
         self.boxSujet.grid(row=1,column=0,sticky = E+W+N+S, columnspan=3)
         self.setSearchPanel()
+        self.setEvents()
+        self.remplirListe()
         
         Button(self.forum, text="Visioner", command=lambda: self.visioner(self.boxSujet.curselection())).grid(row=2,column=0)
         Button(self.forum, text="Supprimer", command=lambda: self.supprimer(self.boxSujet.curselection())).grid(row=2,column=1)
@@ -52,7 +54,7 @@ class SujetVue():
     def setSearchPanel(self):        
         self.choixOrder = ('Date croisante', 'Date décroisant', 'Auteur (A-Z)', 'Auteur (Z-A)', 'Nom sujet (A-Z)','Nom sujet (Z-A)')
         self.listeOrder = ttk.Combobox(self.forum,values = self.choixOrder, state = 'readonly')
-        self.listeOrder.set(self.choixOrder[1])
+        self.listeOrder.set(self.choixOrder[0])
         self.listeOrder.grid(row=0,column=0)
         
         self.searchField = AutocompleteEntry(self.commandes,self, self.forum)
@@ -65,7 +67,7 @@ class SujetVue():
 
     def remplirListe(self):
         self.boxSujet.delete(0, END)
-        self.sujets = self.commandes.searchSujets() #[Sujet(1, "Un", "hier", "2", "demain", None), Sujet(2, "Deux", "demain", "3", "hier", None)]
+        self.sujets = self.commandes.searchSujets(self.listeOrder.get()) #[Sujet(1, "Un", "hier", "2", "demain", None), Sujet(2, "Deux", "demain", "3", "hier", None)]
         for sujet in self.sujets:
             self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages))
 
@@ -92,6 +94,13 @@ class SujetVue():
         self.commandes.ajouteSujet(titre)
         nsujet.destroy()
         self.remplirListe()
+
+    def setEvents(self):
+        self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
+
+    def onComboBox(self,event):
+        self.remplirListe()
+
         
 class MessageVue():
     def __init__(self, n, commandes, root):
