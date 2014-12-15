@@ -97,15 +97,21 @@ class MessageVue():
     def setTopLevel(self, root):
         self.mess = Toplevel(root, width=100, height=100)
         self.mess.title(self.commandes.trouveTitreSujetByID(self.id))
-        
+
+        self.frame = Frame(self.mess, bd=2, relief=SUNKEN)
+        self.frame.grid_rowconfigure(0, weight=1)
+        self.frame.grid_columnconfigure(0, weight=1)
+
     def setCanevas(self):
-        self.yscrollbar = Scrollbar(self.mess)
+        self.yscrollbar = Scrollbar(self.frame)
         self.yscrollbar.grid(row=0, column=1, sticky=N+S)
 
-        self.canevas = Canvas(self.mess, bd=0, scrollregion=(0, 0, 100, 100), width=100, height=100, yscrollcommand=self.yscrollbar.set)
+        self.canevas = Canvas(self.frame, bd=0, scrollregion=(0, 0, 100, 100), width=100, height=100, yscrollcommand=self.yscrollbar.set)
         self.canevas.grid(row=0, column=0, sticky=W+E+N+S)
 
         self.yscrollbar.config(command=self.canevas.yview)
+        self.frame.bind("<Configure>", self.OnFrameConfigure)
+        self.frame.pack()
 
     def setSearchPanel(self):        
         self.choixOrder = ('Date croisante', 'Date décroisant', 'Nom (A-Z)', 'Nom (Z-A)')
@@ -139,6 +145,10 @@ class MessageVue():
         #self.searchField.bind('<Key>', self.onSearchField)
         
         Button(self.canevas, text="Ajouter", command=self.ajouter).grid(row=2,column=2, sticky=W)
+
+    def OnFrameConfigure(self, event):
+        '''Reset the scroll region to encompass the inner frame'''
+        self.canevas.configure(scrollregion=self.canevas.bbox("all"))
         
     def bouge(self, type, amount, what=None):
         print("YEP", type, amount, what)
