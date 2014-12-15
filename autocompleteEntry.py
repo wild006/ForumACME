@@ -53,7 +53,7 @@ class AutocompleteEntry(Entry):
         
     def selection(self, event):
         #print(event, self.words[self.lb.curselection()[0]].texte)
-        messageChoisi = self.words[self.lb.curselection()[0]]
+        messageChoisi = self.words[int(self.lb.curselection()[0])]
         if self.lb_up:
             self.var.set(self.lb.get(ACTIVE))
             self.lb.destroy()
