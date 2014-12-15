@@ -26,19 +26,18 @@ class AutocompleteEntry(Entry):
             self.lb_up = False
         else:
             #words = self.comparison()
-            words = self.comparisonBD()
-            print(words)
-            if words:
-                print(words)
+            self.words = self.comparisonBD()
+            print(self.words)
+            if self.words:
                 if not self.lb_up:
-                    self.lb = Listbox(self.parent)
+                    self.lb = Listbox(self.parent, width = self.winfo_width())
                     self.lb.bind("<Double-Button-1>", self.selection)
                     self.lb.bind("<Right>", self.selection)
                     self.lb.place(x=self.winfo_x(), y=self.winfo_y()+self.winfo_height())
                     self.lb_up = True
                 
                 self.lb.delete(0, END)
-                for w in words:
+                for w in self.words:
                     print(w)
                     self.lb.insert(END,w.texte)
             else:
@@ -47,7 +46,8 @@ class AutocompleteEntry(Entry):
                     self.lb_up = False
         
     def selection(self, event):
-
+        print(event, self.words[self.lb.curselection()[0]].texte)
+        messageChoisi = self.words[self.lb.curselection()[0]]
         if self.lb_up:
             self.var.set(self.lb.get(ACTIVE))
             self.lb.destroy()

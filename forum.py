@@ -100,7 +100,7 @@ class MessageVue():
 
         self.canevas = Canvas(frame, bd=0, scrollregion=(0, 0, 1000, 1000),
                 yscrollcommand=self.yscrollbar.set)
-        self.canevas.grid(row=0, column=0, sticky=N+S+E+W)
+        self.canevas.grid(row=0, column=0, sticky=W+E+N+S)
 
         self.yscrollbar.config(command=self.canevas.yview)
 
@@ -110,17 +110,23 @@ class MessageVue():
         self.canevas.create_window((0,0),window=self.panelHaut,anchor='nw', tags="panelHaut")
         
         self.choixOrder = ('Date croisante', 'Date décroisant', 'Nom (A-Z)', 'Nom (Z-A)')
-        self.listeOrder = ttk.Combobox(self.panelHaut,values = self.choixOrder, state = 'readonly')
+        self.listeOrder = ttk.Combobox(self.canevas,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
-        self.listeOrder.pack(side=RIGHT)
+        self.listeOrder.grid(row=0,column=0)
 
-        #self.searchField = Entry(self.panelHaut)
-        self.searchField = AutocompleteEntry(self.commandes, self.canevas)
+        self.searchField = AutocompleteEntry(self.commandes,self.canevas)
+        self.searchField.grid(row=0,column=1, sticky = W+E)
+        
+        self.choixSearch = ('Message contenant', 'Message commençant par')
+        self.listeSearch= ttk.Combobox(self.canevas,values = self.choixSearch, state = 'readonly')
+        self.listeSearch.set(self.choixSearch[0])
+        self.listeSearch.grid(row=0,column=2, sticky = E+W)
        
         
-        self.panelHaut.pack()
+        #self.panelHaut.pack()
 
-        self.searchField.pack()
+        #self.searchField.pack()
+        #self.listeSearch.pack()
         
         #scrollbar = Scrollbar(self.mess)
         #scrollbar.pack(side=RIGHT, fill=Y)
@@ -130,18 +136,18 @@ class MessageVue():
         #self.m = self.canevas.create_window((0,0),window=PanedWindow(self.canevas,orient=VERTICAL),anchor='nw')
         self.m = PanedWindow(self.canevas,orient=VERTICAL)
         self.canevas.create_window((0,0),window=self.m,anchor='nw', tags="panelMessage")
-        self.m.pack()
+        self.m.grid(row=1,column=0,columnspan=3,  sticky=W)
         self.remplirListe()
         #self.m.pack()
-        self.canevas.tag_raise("panelHaut")
-        self.canevas.tag_lower("panelMessage")
+        #self.canevas.tag_raise("panelHaut")
+        #self.canevas.tag_lower("panelMessage")
         #events
         self.mess.bind_all("<MouseWheel>",self.scroll)
         self.yscrollbar.bind('<ButtonRelease-1>',self.scroll)
         self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
-        self.searchField.bind('<Key>', self.onSearchField)
+        #self.searchField.bind('<Key>', self.onSearchField)
         
-        Button(self.canevas, text="Ajouter", command=self.ajouter).pack()
+        Button(self.canevas, text="Ajouter", command=self.ajouter).grid(row=2,column=2, sticky=W)
         #Button(self.canevas, text="Répondre", command=lambda: self.repondre(self.message.curselection())).pack()
         #Button(self.canevas, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
         
@@ -153,11 +159,11 @@ class MessageVue():
         print("combo", event, self.listeOrder.get())
         self.remplirListe()
 
-    def onSearchField(self, event): #event
-        print("key", event.char)
+    #def onSearchField(self, event): #event
+        #print("key", event.char)
         #self.searchField
-        self.canevas.tag_raise("panelHaut")
-        self.canevas.tag_lower("panelMessage")
+        #self.canevas.tag_raise("panelHaut")
+        #self.canevas.tag_lower("panelMessage")
     
     def remplirListe(self):
         #Delete messages
