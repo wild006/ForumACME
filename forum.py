@@ -107,25 +107,25 @@ class MessageVue():
 
         self.yscrollbar.config(command=self.canevas.yview)
 
-    def setSearchPanel(self):
-        self.panelHaut = PanedWindow(self.canevas,orient=HORIZONTAL, width=100, height=100)
-        self.canevas.create_window((0,0),window=self.panelHaut,anchor='nw', tags="panelHaut")
-        
+    def setSearchPanel(self):        
         self.choixOrder = ('Date croisante', 'Date décroisant', 'Nom (A-Z)', 'Nom (Z-A)')
-        self.listeOrder = ttk.Combobox(self.panelHaut,values = self.choixOrder, state = 'readonly')
+        self.listeOrder = ttk.Combobox(self.canevas,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
-        self.listeOrder.pack(side=RIGHT)
+        self.listeOrder.grid(row=0,column=0)
         
-        self.searchField = AutocompleteEntry(self.commandes, self.canevas)
-       
-        self.panelHaut.pack()
-
-        self.searchField.pack()
+        self.searchField = AutocompleteEntry(self.commandes,self, self.canevas)
+        self.searchField.grid(row=0,column=1, sticky = W+E)
+        
+        self.choixSearch = ('Message contenant', 'Message commençant par')
+        self.listeSearch= ttk.Combobox(self.canevas,values = self.choixSearch, state = 'readonly')
+        self.listeSearch.set(self.choixSearch[0])
+        self.listeSearch.grid(row=0,column=2, sticky = E+W)
 
     def setMessPanel(self):
         self.m = PanedWindow(self.canevas,orient=VERTICAL, width=100, height=100)
         self.canevas.create_window((0,0), window=self.m,anchor='nw', tags="panelMessage", height=100, width=100)
-        self.m.pack()
+        self.m.grid(row=1,column=0,columnspan=3,  sticky=W)
+        
         self.remplirListe()
         
         self.canevas.tag_raise("panelHaut")
