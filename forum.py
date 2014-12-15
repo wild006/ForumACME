@@ -57,8 +57,10 @@ class SujetVue():
         self.listeOrder.set(self.choixOrder[0])
         self.listeOrder.grid(row=0,column=0)
         
-        self.searchField = AutocompleteEntry(self.commandes,self, self.forum)
+        self.searchField = AutocompleteEntry(self.commandes, self, self.forum)
         self.searchField.grid(row=0,column=1, sticky = W+E)
+        
+        Button(text="Go!", command=self.recherche).grid(row=0, column=3)
         
         self.choixSearch = ('Sujet contenant', 'Sujet commençant par', 'Message contenant', 'Message commençant par')
         self.listeSearch= ttk.Combobox(self.forum,values = self.choixSearch, state = 'readonly')
@@ -67,7 +69,7 @@ class SujetVue():
 
     def remplirListe(self):
         self.boxSujet.delete(0, END)
-        self.sujets = self.commandes.searchSujets(self.listeOrder.get()) #[Sujet(1, "Un", "hier", "2", "demain", None), Sujet(2, "Deux", "demain", "3", "hier", None)]
+        self.sujets = self.commandes.searchSujets(self.listeOrder.get())
         for sujet in self.sujets:
             self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages))
 
@@ -97,7 +99,13 @@ class SujetVue():
 
     def setEvents(self):
         self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
+        #self.searchField.bind("\n", self.recherche)
 
+    def recherche(self):
+        print(self.searchField.get())
+        trouve = self.onSearchComparaison(self.searchField.get())
+        MessageVue(trouve[0].id, self.commandes, self.forum)
+        
     def onComboBox(self,event):
         self.remplirListe()
 
@@ -178,7 +186,6 @@ class MessageVue():
         self.canevas.configure(scrollregion=self.canevas.bbox("all"))
         
     def bouge(self, type, amount, what=None):
-        print("YEP", type, amount, what)
         if what:
             self.canevas.yview(type, amount, what)
         else:
@@ -189,7 +196,6 @@ class MessageVue():
         self.canevas.yview(SCROLL, event.delta, "units")
         
     def onComboBox(self, event): #event
-        print("combo", event, self.listeOrder.get())
         self.remplirListe()
 
     def onSearchComparaison(self,texte):
@@ -248,7 +254,6 @@ class MessageVue():
         #messageArepondre = self.messages[indiceMessageListe]
         message = self.commandes.searchMessageParID(messageArepondre.id)
         rep = ""
-        print(message.auteur)
         rep += message.auteur + " à dit: \n> "
         for c in message.texte:
             rep += c

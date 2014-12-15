@@ -63,7 +63,6 @@ class Commandes():
     def insererMessage(self, nomSujet, texte):
         #POUR DES TESTS !
         idSujet = self.trouveIdSujet(nomSujet)
-        print("id",idSujet)
         datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         datePresent = "'" + datePresent + "'"
         if idSujet:
@@ -77,7 +76,6 @@ class Commandes():
         datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         datePresent = "'" + datePresent + "'"
         texte = re.escape(texte)
-        print(texte)
         texte = "'" + texte + "'"
         user = "'" + user + "'"
         if idSujet and messageReponduId:
@@ -91,7 +89,6 @@ class Commandes():
         nom = re.escape(nom)
         nom = "'" + nom + "'"
         user = "'" + user + "'"
-        print(nom)
         self.executeCommand("INSERT INTO SUJET(nom, date, user) VALUES(%s,%s, %s)"%(nom,datePresent, user), True)
     
     def trouveIdSujet(self,nomSujet):
@@ -99,9 +96,7 @@ class Commandes():
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
             command = "SELECT id FROM SUJET WHERE nom = " + nomSujet
-            print(command)
             cursor.execute(command, (nomSujet))
-            print("cursor", cursor)
             result = cursor.fetchone()#Il devrait avoir qu'un sujet avec ce nom...
             db.close()
             return result[0]
@@ -115,11 +110,9 @@ class Commandes():
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
         command = "SELECT nom FROM SUJET WHERE id = %i" % (idSujet)
-        print(command)
         cursor.execute(command)
         nom = cursor.fetchone()
         db.close()
-        print("nom", nom[0])
         return nom[0]
     
     def executeScript(self,path,db):
@@ -130,14 +123,12 @@ class Commandes():
         sqlCommands = fileCommands.split(';')
 
         for command in sqlCommands:
-            print(command)
             regex = re.search(r'\S', command, re.I)
             if regex:
                 cursor = db.cursor()
                 cursor.execute(command)
             else:
                 print("pas valide")
-                print(command)
 
 
     def creerUser(self,nom,prenom,username,passwd,mail):
@@ -148,9 +139,7 @@ class Commandes():
         try:
             cursor = self.db.cursor()
             command = "SELECT * FROM USER WHERE username = " + username
-            print(command)
             cursor.execute(command)
-            print("cursor", cursor)
         except:
             print("pas trouvé")
 
@@ -160,11 +149,8 @@ class Commandes():
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
             orderByClause = self.orderByValue[orderById]
-            print(orderByClause)
             command = "SELECT * FROM SUJET ORDER BY %s" %(orderByClause)
-            print(command)
             cursor.execute(command)
-            print("cursor", cursor)
         except:
             print("pas trouvé")
 
@@ -182,19 +168,15 @@ class Commandes():
         try:
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
-            print(sujet)
             idSujet = self.trouveIdSujet(sujet)
             if idSujet == None:
                 db.close()
                 return 0
             command = "SELECT COUNT(*) FROM MESSAGE WHERE sujet = " + str(idSujet)
-            print(command)
             cursor.execute(command)
-            print("cursor", cursor)
 
             result = cursor.fetchone()
             db.close()
-            print(result[0])
             return result[0]
         except:
             print("pas trouvé")
@@ -277,7 +259,6 @@ class Commandes():
         for (_id, text, date, reponse,user,sujet) in cursor:
             message = Message(_id,text,date,user,reponse, sujet)
             messages.append(message)
-        print(len(messages))
         return messages
 
     def formatTextSearch(self, idTypeSearch, texte):
@@ -292,13 +273,11 @@ class Commandes():
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
         command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i  " % (idMessage, idSujet)
-        print(command)
         cursor.execute(command)
         db.commit()
         db.close()
 
     def supprimerSujetParID(self, idSujet):
-        print("SUpprimer", idSujet)
         #Supprimer tous les messages de ce sujet
         messages = self.searchMessages(idSujet)
         if messages:
@@ -309,7 +288,6 @@ class Commandes():
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
         command = "DELETE FROM SUJET WHERE id = %i" % (idSujet)
-        print(command)
         cursor.execute(command)
         db.commit()
         db.close()
