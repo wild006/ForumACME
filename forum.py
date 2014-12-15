@@ -81,30 +81,21 @@ class MessageVue():
         self.commandes = commandes
         self.id = int(n)
         self.forum = root
-        self.mess = Toplevel(self.forum)
+        self.mess = Toplevel(self.forum, width=100, height=100)
 
         self.mess.title(self.commandes.trouveTitreSujetByID(self.id)) # Voir l'item du TODO
         self.messageGraphic = []
-        #self.message = MultiListbox(self.mess, (('Texte', 40), ('Auteur', 20), ('Date', 10)))
-        #self.message.pack(expand=YES, fill=BOTH)
+
         self.messages = [] # Tous les messages de la liste
 
-        #Mettre un canvas pour le scroll
-        frame = Frame(self.mess, bd=2, relief=SUNKEN)
-
-        frame.grid_rowconfigure(0, weight=1)
-        frame.grid_columnconfigure(0, weight=1)
-
-        self.yscrollbar = Scrollbar(frame)
+        self.yscrollbar = Scrollbar(self.mess)
         self.yscrollbar.grid(row=0, column=1, sticky=N+S)
 
-        self.canevas = Canvas(frame, bd=0, scrollregion=(0, 0, 1000, 1000),
-                yscrollcommand=self.yscrollbar.set)
-        self.canevas.grid(row=0, column=0, sticky=N+S+E+W)
+        self.canevas = Canvas(self.mess, bd=0, scrollregion=(0, 0, 1000, 1000), width=100, height=100, yscrollcommand=self.yscrollbar.set)
+        self.canevas.grid(row=0, column=0)
 
         self.yscrollbar.config(command=self.canevas.yview)
 
-        frame.pack()
         # Choix du Order by
         self.panelHaut = PanedWindow(self.canevas,orient=HORIZONTAL)
         self.canevas.create_window((0,0),window=self.panelHaut,anchor='nw', tags="panelHaut")
@@ -128,8 +119,8 @@ class MessageVue():
         #scrollbar.config(command=self.canevas.yview)
         #self.canevas.pack()
         #self.m = self.canevas.create_window((0,0),window=PanedWindow(self.canevas,orient=VERTICAL),anchor='nw')
-        self.m = PanedWindow(self.canevas,orient=VERTICAL)
-        self.canevas.create_window((0,0),window=self.m,anchor='nw', tags="panelMessage")
+        self.m = PanedWindow(self.canevas,orient=VERTICAL, width=100, height=100)
+        self.canevas.create_window((0,0), window=self.m,anchor='nw', tags="panelMessage")
         self.m.pack()
         self.remplirListe()
         #self.m.pack()
@@ -138,17 +129,22 @@ class MessageVue():
         #events
         self.mess.bind_all("<MouseWheel>",self.scroll)
         self.yscrollbar.bind('<ButtonRelease-1>',self.scroll)
+        
         self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
         self.searchField.bind('<Key>', self.onSearchField)
         
         Button(self.canevas, text="Ajouter", command=self.ajouter).pack()
-        #Button(self.canevas, text="Répondre", command=lambda: self.repondre(self.message.curselection())).pack()
-        #Button(self.canevas, text="Supprimer", command=lambda: self.supprimer(self.message.curselection())).pack()
-        
-    def scroll(self,event): #event
-        print("scroll", event.delta)
-        #self.yscrollbar.config(command=self.canevas.yview)
 
+    def bouge(self, type, amount, what=None):
+        print("YEP", type, amount, what)
+        if what:
+            self.canevas.yview(type, amount, what)
+        else:
+            self.canevas.yview(type, amount)
+
+    def scroll(self, event):
+        self.canevas.yview(SCROLL, event.delta, "units")
+        
     def onComboBox(self, event): #event
         print("combo", event, self.listeOrder.get())
         self.remplirListe()
@@ -165,7 +161,7 @@ class MessageVue():
             message.canevas.destroy()
         self.messageGraphic = []
         
-        self.messages = self.commandes.searchMessages(self.id,self.listeOrder.get() ) #[Message(1, "Premier", "Jamais", "Moi", self.id, self.id), Message(2, "Second", "Toujours", "L'autre", self.id, self.id)]
+        self.messages = self.commandes.searchMessages(self.id,self.listeOrder.get() )
         for m in self.messages:
             #m.texte = self.chopMessage(m)
             self.messageGraphic.append(MesssageCanvas(self.m,self, m))
