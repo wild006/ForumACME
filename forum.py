@@ -52,10 +52,10 @@ class SujetVue():
         self.boxSujet.delete(0, END)
         self.sujets = self.commandes.searchSujets() #[Sujet(1, "Un", "hier", "2", "demain", None), Sujet(2, "Deux", "demain", "3", "hier", None)]
         for sujet in self.sujets:
-            self.boxSujet.insert(END, ('Important Message: ' + sujet.nom, sujet.date, sujet.nbMessages))
+            self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages))
 
     def visioner(self, event):
-        MessageVue(self.sujets[event[0]].id, self.commandes, self.forum)
+        MessageVue(self.sujets[int(event[0])].id, self.commandes, self.forum)
 
     def supprimer(self, event):
         indiceSujetListe = event[0]
