@@ -52,7 +52,7 @@ class SujetVue():
         Button(self.forum, text="Ajouter", command=self.ajouter).grid(row=2,column=2)
 
     def setSearchPanel(self):        
-        self.choixOrder = ('Date croissante', 'Date décroissant', 'Auteur (A-Z)', 'Auteur (Z-A)', 'Nom sujet (A-Z)','Nom sujet (Z-A)')
+        self.choixOrder = ('Date croissante', 'Date décroissante', 'Auteur (A-Z)', 'Auteur (Z-A)', 'Nom sujet (A-Z)','Nom sujet (Z-A)')
         self.listeOrder = ttk.Combobox(self.forum,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
         self.listeOrder.grid(row=0,column=0)
@@ -159,7 +159,7 @@ class MessageVue():
         self.frame.pack()
         
     def setSearchPanel(self):        
-        self.choixOrder = ('Date croissante', 'Date décroissant', 'Auteur (A-Z)', 'Auteur (Z-A)')
+        self.choixOrder = ('Date croissante', 'Date décroissante', 'Auteur (A-Z)', 'Auteur (Z-A)')
         self.listeOrder = ttk.Combobox(self.frame,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
         self.listeOrder.grid(row=0,column=0)
