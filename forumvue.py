@@ -39,7 +39,7 @@ class SujetVue():
         self.forum = Tk()
         self.commandes = commandes
         
-        self.boxSujet = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Nombre de messages', 10)))
+        self.boxSujet = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Nombre de messages', 10), ('Dernier message', 40)))
         self.sujets = [] # Tous les sujets
         
         self.boxSujet.grid(row=1,column=0,sticky = E+W+N+S, columnspan=3)
@@ -71,8 +71,11 @@ class SujetVue():
         self.boxSujet.delete(0, END)
         self.sujets = self.commandes.searchSujets(self.listeOrder.get())
         for sujet in self.sujets:
-            self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages))
-
+            m = self.commandes.searchMessages(sujet.id)
+            if m:
+                self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages, m[0].date))
+            else:
+                self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages, 'Jamais'))
     def onSearchComparaison(self,texte):
         return self.commandes.searchTextSujet(texte, self.listeSearch.get())
 
@@ -81,7 +84,7 @@ class SujetVue():
 
     def supprimer(self, event):
         indiceSujetListe = event[0]
-        sujetASupprimer = self.sujets[indiceSujetListe]
+        sujetASupprimer = self.sujets[int(indiceSujetListe)]
         self.commandes.supprimerSujetParID(sujetASupprimer.id)
         self.remplirListe()
         
