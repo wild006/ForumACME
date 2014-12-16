@@ -9,10 +9,10 @@ nomDB = "FORUM"
 class Commandes():
     def __init__(self):
         self.user = "root"
-        self.passwd = "AAAaaa111"
+        self.passwd = "aaaAAA111"
         self.host = "127.0.0.1"
         self.nomDB = "FORUM"
-        self.orderByValue = {'Date croisante':"date ASC ", 'Date décroisant':"date DESC", 'Auteur (A-Z)':"user ASC", 'Auteur (Z-A)':"user DESC", 'Nom sujet (A-Z)':"nom ASC",'Nom sujet (Z-A)':"nom DESC"}
+        self.orderByValue = {'Date croissante':"date ASC ", 'Date décroissant':"date DESC", 'Auteur (A-Z)':"user ASC", 'Auteur (Z-A)':"user DESC", 'Nom sujet (A-Z)':"nom ASC",'Nom sujet (Z-A)':"nom DESC"}
         self.searchTypeValue = {'Message contenant':1, 'Message commençant par':2,'Sujet contenant':3, 'Sujet commençant par':4}
         self.startUp()
         self.v = SujetVue(self)
@@ -143,7 +143,7 @@ class Commandes():
         except:
             print("pas trouvé")
 
-    def searchSujets(self, orderById = 'Date croisante'):
+    def searchSujets(self, orderById = 'Date croissante'):
         cursor = -1 #Pas trouvé
         try:
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
@@ -193,7 +193,7 @@ class Commandes():
         result = cursor.fetchone()
         return Message(result[0], result[1], result[2], result[4], result[3], result[5])
 
-    def searchMessages(self, idSujet, orderById = 'Date décroisant'):
+    def searchMessages(self, idSujet, orderById = 'Date décroissant'):
         if True:
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             orderByClause = self.orderByValue[orderById]
