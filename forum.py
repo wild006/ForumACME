@@ -95,7 +95,7 @@ class Commandes():
         try:
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
-            command = "SELECT id FROM SUJET WHERE nom = %s"
+            command = "SELECT id FROM SUJET WHERE nom = " + nomSujet
             cursor.execute(command, (nomSujet))
             result = cursor.fetchone()#Il devrait avoir qu'un sujet avec ce nom...
             db.close()
@@ -109,8 +109,8 @@ class Commandes():
     def trouveTitreSujetByID(self, idSujet):
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
-        command = "SELECT nom FROM SUJET WHERE id = %i"
-        cursor.execute(command, (idSujet))
+        command = "SELECT nom FROM SUJET WHERE id = %i" % (idSujet)
+        cursor.execute(command)
         nom = cursor.fetchone()
         db.close()
         return nom[0]
@@ -138,8 +138,8 @@ class Commandes():
     def searchUser(self,username):
         try:
             cursor = self.db.cursor()
-            command = "SELECT * FROM USER WHERE username = %s"
-            cursor.execute(command, (username))
+            command = "SELECT * FROM USER WHERE username = " + username
+            cursor.execute(command)
         except:
             print("pas trouvé")
 
@@ -149,8 +149,8 @@ class Commandes():
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
             orderByClause = self.orderByValue[orderById]
-            command = "SELECT * FROM SUJET ORDER BY %s"
-            cursor.execute(command, (orderByClause))
+            command = "SELECT * FROM SUJET ORDER BY %s" %(orderByClause)
+            cursor.execute(command)
         except:
             print("pas trouvé")
 
@@ -172,8 +172,8 @@ class Commandes():
             if idSujet == None:
                 db.close()
                 return 0
-            command = "SELECT COUNT(*) FROM MESSAGE WHERE sujet = %s"
-            cursor.execute(command, (str(idSujet)))
+            command = "SELECT COUNT(*) FROM MESSAGE WHERE sujet = " + str(idSujet)
+            cursor.execute(command)
 
             result = cursor.fetchone()
             db.close()
@@ -187,8 +187,8 @@ class Commandes():
     def searchMessageParID(self,idMessage):
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
-        command = "SELECT * FROM MESSAGE WHERE id = %s"
-        cursor.execute(command, (str(idMessage)))
+        command = "SELECT * FROM MESSAGE WHERE id = " + str(idMessage)
+        cursor.execute(command)
         db.close()
         result = cursor.fetchone()
         return Message(result[0], result[1], result[2], result[4], result[3], result[5])
@@ -198,8 +198,8 @@ class Commandes():
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             orderByClause = self.orderByValue[orderById]
             cursor = db.cursor()
-            command = "SELECT * FROM MESSAGE WHERE sujet = %i ORDER BY %s"
-            cursor.execute(command,(idSujet,orderByClause))
+            command = "SELECT * FROM MESSAGE WHERE sujet = %i ORDER BY %s" % (idSujet,orderByClause)
+            cursor.execute(command)
         else:
             db.close()
 
@@ -220,8 +220,8 @@ class Commandes():
             letters = self.formatTextSearch(idTypeSearch, letters)
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
-            command = "SELECT * FROM SUJET WHERE nom LIKE %s"
-            cursor.execute(command, (letters))
+            command = "SELECT * FROM SUJET WHERE nom LIKE %s" % (letters)
+            cursor.execute(command)
             db.close()
         except:
             db.close()
@@ -247,8 +247,8 @@ class Commandes():
             letters = self.formatTextSearch(self.searchTypeValue[typeSearch], letters)
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
             cursor = db.cursor()
-            command = "SELECT * FROM MESSAGE WHERE %s texte LIKE %s"
-            cursor.execute(command, (sujetSearch, letters))
+            command = "SELECT * FROM MESSAGE WHERE %s texte LIKE %s" % (sujetSearch, letters)
+            cursor.execute(command)
             db.close()
         except:
             db.close()
@@ -272,8 +272,8 @@ class Commandes():
     def supprimerMessageParID(self, idMessage, idSujet):
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
-        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i"
-        cursor.execute(command, (idMessage, idSujet))
+        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i  " % (idMessage, idSujet)
+        cursor.execute(command)
         db.commit()
         db.close()
 
@@ -287,8 +287,8 @@ class Commandes():
         #Supprimer le sujet
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
-        command = "DELETE FROM SUJET WHERE id = %i"
-        cursor.execute(command,(idSujet))
+        command = "DELETE FROM SUJET WHERE id = %i" % (idSujet)
+        cursor.execute(command)
         db.commit()
         db.close()
 
