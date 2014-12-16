@@ -115,7 +115,7 @@ class MessageVue():
         """Affiche les messages du sujet a l'id `n'"""
         self.commandes = commandes
         self.id = int(n)
-        
+        self.root = root
         self.messageGraphic = []
         self.messages = [] # Tous les messages de la liste
         
@@ -131,7 +131,7 @@ class MessageVue():
         
     def setTopLevel(self, root):
         self.mess = Toplevel(root, width=100, height=100)
-        self.mess.title(self.commandes.trouveTitreSujetByID(self.id))
+        # self.mess.title(self.commandes.trouveTitreSujetByID(self.id))
 
         self.frame = Frame(self.mess, bd=2, relief=SUNKEN)
         self.frame.grid_rowconfigure(0, weight=1)
@@ -161,7 +161,16 @@ class MessageVue():
         self.listeSearch= ttk.Combobox(self.canevas,values = self.choixSearch, state = 'readonly')
         self.listeSearch.set(self.choixSearch[0])
         self.listeSearch.grid(row=0,column=2, sticky = E+W)
+        Button(self.canevas, text="Go!", command=self.recherche).grid(row=0, column=3)
 
+    def recherche(self):
+        trouve = self.onSearchComparaison(self.searchField.get())
+        self.ouvreUn(trouve[0])
+
+    def ouvreUn(self, mess):
+        top = Toplevel(self.root)
+        MesssageCanvas(top, self, mess)
+    
     def setMessPanel(self):
         self.m = PanedWindow(self.canevas,orient=VERTICAL, width=100, height=100)
         self.canevas.create_window((0,0), window=self.m,anchor='nw', tags="panelMessage", height=100, width=100)
