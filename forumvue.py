@@ -130,39 +130,41 @@ class MessageVue():
         self.setEvents()
         
     def setTopLevel(self, root):
-        self.mess = Toplevel(root, width=100, height=100)
+        self.mess = Toplevel(root)
         # self.mess.title(self.commandes.trouveTitreSujetByID(self.id))
 
-        self.frame = Frame(self.mess, bd=2, relief=SUNKEN)
-        self.frame.grid_rowconfigure(0, weight=1)
-        self.frame.grid_columnconfigure(0, weight=1)
-
+        self.frame = Frame(self.mess, bd=2, relief=SUNKEN, width=800, height=500)
+        # self.frame.grid_rowconfigure(0, weight=1)
+        # self.frame.grid_columnconfigure(0, weight=3)
+        
     def setCanevas(self):
         self.yscrollbar = Scrollbar(self.frame)
-        self.yscrollbar.grid(row=0, column=1, sticky=N+S)
 
-        self.canevas = Canvas(self.frame, bd=0, scrollregion=(0, 0, 100, 100), width=100, height=100, yscrollcommand=self.yscrollbar.set)
-        self.canevas.grid(row=0, column=0, sticky=W+E+N+S)
+        self.yscrollbar.grid(row=1, column=4, sticky=N+S)
 
-        self.yscrollbar.config(command=self.canevas.yview)
-        self.frame.bind("<Configure>", self.OnFrameConfigure)
+        self.canevas = Canvas(self.frame, bd=0, width=800, height=500, yscrollcommand=self.yscrollbar.set)
+        self.canevas.grid(row=1, column = 0, columnspan = 4)
+
+        self.yscrollbar.config(command=self.bouge)
+        # self.frame.bind("<Configure>", self.OnFrameConfigure)
+        # self.frame.grid(row=0, column=0, sticky=W+E+N+S)
         self.frame.pack()
-
+        
     def setSearchPanel(self):        
         self.choixOrder = ('Date croissante', 'Date décroissant', 'Auteur (A-Z)', 'Auteur (Z-A)')
-        self.listeOrder = ttk.Combobox(self.canevas,values = self.choixOrder, state = 'readonly')
+        self.listeOrder = ttk.Combobox(self.frame,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
         self.listeOrder.grid(row=0,column=0)
         
-        self.searchField = AutocompleteEntry(self.commandes,self, self.canevas)
+        self.searchField = AutocompleteEntry(self.commandes,self, self.frame)
         self.searchField.grid(row=0,column=1, sticky = W+E)
         
         self.choixSearch = ('Message contenant', 'Message commençant par')
-        self.listeSearch= ttk.Combobox(self.canevas,values = self.choixSearch, state = 'readonly')
+        self.listeSearch= ttk.Combobox(self.frame,values = self.choixSearch, state = 'readonly')
         self.listeSearch.set(self.choixSearch[0])
         self.listeSearch.grid(row=0,column=2, sticky = E+W)
-        Button(self.canevas, text="Go!", command=self.recherche).grid(row=0, column=3)
-
+        Button(self.frame, text="Go!", command=self.recherche).grid(row=0, column=3)
+        
     def recherche(self):
         trouve = self.onSearchComparaison(self.searchField.get())
         self.ouvreUn(trouve[0])
@@ -172,9 +174,9 @@ class MessageVue():
         MesssageCanvas(top, self, mess)
     
     def setMessPanel(self):
-        self.m = PanedWindow(self.canevas,orient=VERTICAL, width=100, height=100)
-        self.canevas.create_window((0,0), window=self.m,anchor='nw', tags="panelMessage", height=100, width=100)
-        self.m.grid(row=1,column=0,columnspan=3,  sticky=W)
+        self.m = PanedWindow(self.canevas,orient=VERTICAL)
+        self.canevas.create_window((400,0), window=self.m, tags="panelMessage")
+        # self.m.grid(row=2,column=0,columnspan=3,  sticky=W)
         
         self.remplirListe()
         
@@ -188,7 +190,7 @@ class MessageVue():
         self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
         #self.searchField.bind('<Key>', self.onSearchField)
         
-        Button(self.canevas, text="Ajouter", command=self.ajouter).grid(row=2,column=2, sticky=W)
+        Button(self.frame, text="Ajouter", command=self.ajouter).grid(row=0,column=4)
 
     def OnFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
@@ -202,7 +204,7 @@ class MessageVue():
 
     def scroll(self, event):
         # print(event.delta)
-        self.canevas.yview(SCROLL, event.delta, "units")
+        self.canevas.yview(SCROLL, 1, "units")
         
     def onComboBox(self, event): #event
         self.remplirListe()
@@ -227,7 +229,8 @@ class MessageVue():
             #m.texte = self.chopMessage(m)
             self.messageGraphic.append(MesssageCanvas(self.m, self, m))
             #self.message.insert(END,(m.texte, m.auteur, m.date))
-
+        self.canevas.config(scrollregion=(0,0, 0, (len(self.messages)*100)-205))
+        
     def chopMessage(self,mess):
         achop = False
         result = ""
