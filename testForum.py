@@ -9,7 +9,7 @@ nomDB = "FORUM"
 class Commandes():
     def __init__(self):
         self.user = "root"
-        self.passwd = "aaaAAA111"
+        self.passwd = "AAAaaa111"
         self.host = "127.0.0.1"
         self.nomDB = "FORUM"
         self.orderByValue = {'Date croissante':"date ASC ", 'Date décroissant':"date DESC", 'Auteur (A-Z)':"user ASC", 'Auteur (Z-A)':"user DESC", 'Nom sujet (A-Z)':"nom ASC",'Nom sujet (Z-A)':"nom DESC"}
