@@ -77,7 +77,7 @@ class SujetVue():
         return self.commandes.searchTextSujet(texte, self.listeSearch.get())
 
     def visioner(self, event):
-        MessageVue(self.sujets[int(event[0])].id, self.commandes, self.forum)
+        MessageVue(self.sujets[int(event[0])].id, self.commandes, self.forum, self)
 
     def supprimer(self, event):
         indiceSujetListe = event[0]
@@ -104,18 +104,26 @@ class SujetVue():
     def recherche(self):
         print(self.searchField.get())
         trouve = self.onSearchComparaison(self.searchField.get())
-        MessageVue(trouve[0].id, self.commandes, self.forum)
         
+        if self.listeSearch.get() == self.choixSearch[0] or self.listeSearch.get() == self.choixSearch[1]:
+            MessageVue(trouve[0].id, self.commandes, self.forum, self)
+        else:
+            self.ouvreUn(trouve[0])
+
     def onComboBox(self,event):
         self.remplirListe()
 
+    def ouvreUn(self, mess):
+        top = Toplevel(self.forum)
+        MesssageCanvas(top, self, mess)
         
 class MessageVue():
-    def __init__(self, n, commandes, root):
+    def __init__(self, n, commandes, root, sujetVue=None):
         """Affiche les messages du sujet a l'id `n'"""
         self.commandes = commandes
         self.id = int(n)
         self.root = root
+        self.parent = sujetVue
         self.messageGraphic = []
         self.messages = [] # Tous les messages de la liste
         
@@ -175,10 +183,11 @@ class MessageVue():
     
     def setMessPanel(self):
         self.m = PanedWindow(self.canevas,orient=VERTICAL)
-        self.canevas.create_window((400,0), window=self.m, tags="panelMessage")
+        # self.canevas.create_window((400,), window=self.m, tags="panelMessage")
         # self.m.grid(row=2,column=0,columnspan=3,  sticky=W)
         
         self.remplirListe()
+        self.canevas.create_window((400,len(self.messages)*(175/2)), window=self.m, tags="panelMessage")
         
         self.canevas.tag_raise("panelHaut")
         self.canevas.tag_lower("panelMessage")
@@ -229,7 +238,8 @@ class MessageVue():
             #m.texte = self.chopMessage(m)
             self.messageGraphic.append(MesssageCanvas(self.m, self, m))
             #self.message.insert(END,(m.texte, m.auteur, m.date))
-        self.canevas.config(scrollregion=(0,0, 0, (len(self.messages)*100)-205))
+        # self.canevas.configure(scrollregion=self.canevas.bbox("all"))
+        self.canevas.config(scrollregion=(0,0, 0, len(self.messages)*175))
         
     def chopMessage(self,mess):
         achop = False
@@ -254,7 +264,9 @@ class MessageVue():
         self.commandes.ajouteMessage(texte.get("1.0", END), self.id, getpass.getuser(), messageRepondu) # END ajoute un \n à la fin. On veut ça?
         nmess.destroy()
         self.remplirListe()
-
+        if self.parent:
+            self.parent.remplirListe()
+        
     def supprimer(self, messageAsupprimer):
         #indiceMessageListe = n[0]
         #messageAsupprimer = self.messages[indiceMessageListe]
