@@ -1,272 +1,309 @@
 #!/usr/bin/env python3
+import mysql.connector
+import re
+import datetime
+from forumvue import *
 
-from tkinter import *
-import tkinter.ttk  as ttk #Pour le combo Box
-from multilistbox import *
-from autocompleteEntry import *
-from testMessageCanvas import *
-import getpass
+nomDB = "FORUM"
 
-class User():
-    def __init__(self, _id, nom, prenom, username, passwd, mail):
-        self.id = _id
-        self.nom = nom
-        self.prenom = prenom
-        self.username = username
-        self.passwd = passwd
-        self.mail = mail
+class Commandes():
+    def __init__(self):
+        self.user = "root"
+        self.passwd = "AAAaaa111"
+        self.host = "127.0.0.1"
+        self.nomDB = "FORUM"
+        self.orderByValue = {'Date croissante':"date ASC ", 'Date décroissant':"date DESC", 'Auteur (A-Z)':"user ASC", 'Auteur (Z-A)':"user DESC", 'Nom sujet (A-Z)':"nom ASC",'Nom sujet (Z-A)':"nom DESC"}
+        self.searchTypeValue = {'Message contenant':1, 'Message commençant par':2,'Sujet contenant':3, 'Sujet commençant par':4}
+        self.startUp()
+        self.v = SujetVue(self)
+        self.v.forum.mainloop()
 
-class Message():
-    def __init__(self, _id, text, date, auteur,reponse, sujetid):
-        self.id = _id
-        self.texte = text
-        self.date = date
-        self.auteur = auteur
-        self.reponse = reponse
-        self.sujetid = sujetid
-        
-class Sujet():
-    def __init__(self, _id, nom, date, nbMessages, dernier, parent):
-        self.id = _id
-        self.nom = nom
-        self.date = date
-        self.nbMessages = nbMessages
-        self.dernier = dernier
-        self.parent = parent
 
-class SujetVue():
-    def __init__(self, commandes):
-        self.forum = Tk()
-        self.commandes = commandes
-        
-        self.boxSujet = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Nombre de messages', 10)))
-        self.sujets = [] # Tous les sujets
-        
-        self.boxSujet.grid(row=1,column=0,sticky = E+W+N+S, columnspan=3)
-        self.setSearchPanel()
-        self.setEvents()
-        self.remplirListe()
-        
-        Button(self.forum, text="Visioner", command=lambda: self.visioner(self.boxSujet.curselection())).grid(row=2,column=0)
-        Button(self.forum, text="Supprimer", command=lambda: self.supprimer(self.boxSujet.curselection())).grid(row=2,column=1)
-        Button(self.forum, text="Ajouter", command=self.ajouter).grid(row=2,column=2)
+    def startUp(self):
+        try:
+            db = mysql.connector.connect(user=self.user, password=self.passwd,
+                                          host=self.host,
+                                         database= self.nomDB)
+            #Tester toutes les tables ? (Corrumption)
+        except:
+            print("pas créé !")
+            db = mysql.connector.connect(host=self.host,
+                                         user=self.user,passwd=self.passwd)
+            self.executeScript("forumDB.sql", db)
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            self.executeScript("forumTables.sql", db)
 
-    def setSearchPanel(self):        
-        self.choixOrder = ('Date croissante', 'Date décroissant', 'Auteur (A-Z)', 'Auteur (Z-A)', 'Nom sujet (A-Z)','Nom sujet (Z-A)')
-        self.listeOrder = ttk.Combobox(self.forum,values = self.choixOrder, state = 'readonly')
-        self.listeOrder.set(self.choixOrder[0])
-        self.listeOrder.grid(row=0,column=0)
-        
-        self.searchField = AutocompleteEntry(self.commandes, self, self.forum)
-        self.searchField.grid(row=0,column=1, sticky = W+E)
-        
-        Button(text="Go!", command=self.recherche).grid(row=0, column=3)
-        
-        self.choixSearch = ('Sujet contenant', 'Sujet commençant par', 'Message contenant', 'Message commençant par')
-        self.listeSearch= ttk.Combobox(self.forum,values = self.choixSearch, state = 'readonly')
-        self.listeSearch.set(self.choixSearch[0])
-        self.listeSearch.grid(row=0,column=2, sticky = E+W)
+        #POUR DES TESTS
+        #INSERTION DE SUJETS
+        #self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('LOL', '1776-7-4 04:13:54')", True)
+        #self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('Pourquoi pas ? ', '1776-7-4 04:13:54')", True)
+        #INSERTION DE MESSAGES
+        #self.insererMessage("'LOL'", "'Premier insert'")
+        #self.insererMessage("'LOL'", "'Deuxième insert'")
+        #self.insererMessage("'Pourquoi pas ? '", "'Un autre message !!!'")
+        #idSujet = self.trouveIdSujet("'LOL'")
+        #print("id",idSujet)
+        #if idSujet:
+        #    self.executeCommand("INSERT INTO MESSAGE(texte, sujet) VALUES('Un message très important !!', " + str(idSujet) + ")", True)
 
-    def remplirListe(self):
-        self.boxSujet.delete(0, END)
-        self.sujets = self.commandes.searchSujets(self.listeOrder.get())
-        for sujet in self.sujets:
-            self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages))
+    def connectionDB(self,user, password, host, nomBD):
+        return mysql.connector.connect(user=user, password=password,
+                                          host=host,
+                                         database= nomDB)
 
-    def onSearchComparaison(self,texte):
-        return self.commandes.searchTextSujet(texte, self.listeSearch.get())
+    def executeCommand(self,command, commit = False):
+        #POUR DES TESTS !
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        cursor.execute(command)
+        if commit:
+            db.commit()
+        db.close()
 
-    def visioner(self, event):
-        MessageVue(self.sujets[int(event[0])].id, self.commandes, self.forum)
+    def insererMessage(self, nomSujet, texte):
+        #POUR DES TESTS !
+        idSujet = self.trouveIdSujet(nomSujet)
+        datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        datePresent = "'" + datePresent + "'"
+        if idSujet:
+            self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date) VALUES(%s,%i,%s)"%(texte,idSujet,datePresent), True)
 
-    def supprimer(self, event):
-        indiceSujetListe = event[0]
-        sujetASupprimer = self.sujets[indiceSujetListe]
-        self.commandes.supprimerSujetParID(sujetASupprimer.id)
-        self.remplirListe()
-        
-    def ajouter(self):
-        nsujet = Tk()
-        Label(nsujet, text="Titre").grid(column = 0, row = 0)
-        titre = Entry(nsujet)
-        titre.grid(column = 1, row = 0)
-        Button(nsujet, text="Go", command=lambda:self.nouveau_sujet(nsujet, titre.get())).grid()
-
-    def nouveau_sujet(self, nsujet, titre):
-        self.commandes.ajouteSujet(titre, getpass.getuser())
-        nsujet.destroy()
-        self.remplirListe()
-
-    def setEvents(self):
-        self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
-        #self.searchField.bind("\n", self.recherche)
-
-    def recherche(self):
-        print(self.searchField.get())
-        trouve = self.onSearchComparaison(self.searchField.get())
-        MessageVue(trouve[0].id, self.commandes, self.forum)
-        
-    def onComboBox(self,event):
-        self.remplirListe()
-
-        
-class MessageVue():
-    def __init__(self, n, commandes, root):
-        """Affiche les messages du sujet a l'id `n'"""
-        self.commandes = commandes
-        self.id = int(n)
-        self.root = root
-        self.messageGraphic = []
-        self.messages = [] # Tous les messages de la liste
-        
-        self.initVue(root)
-
-        
-    def initVue(self, root):
-        self.setTopLevel(root)
-        self.setCanevas()
-        self.setSearchPanel()
-        self.setMessPanel()
-        self.setEvents()
-        
-    def setTopLevel(self, root):
-        self.mess = Toplevel(root, width=100, height=100)
-        # self.mess.title(self.commandes.trouveTitreSujetByID(self.id))
-
-        self.frame = Frame(self.mess, bd=2, relief=SUNKEN)
-        self.frame.grid_rowconfigure(0, weight=1)
-        self.frame.grid_columnconfigure(0, weight=1)
-
-    def setCanevas(self):
-        self.yscrollbar = Scrollbar(self.frame)
-        self.yscrollbar.grid(row=0, column=1, sticky=N+S)
-
-        self.canevas = Canvas(self.frame, bd=0, scrollregion=(0, 0, 100, 100), width=100, height=100, yscrollcommand=self.yscrollbar.set)
-        self.canevas.grid(row=0, column=0, sticky=W+E+N+S)
-
-        self.yscrollbar.config(command=self.canevas.yview)
-        self.frame.bind("<Configure>", self.OnFrameConfigure)
-        self.frame.pack()
-
-    def setSearchPanel(self):        
-        self.choixOrder = ('Date croissante', 'Date décroissant', 'Auteur (A-Z)', 'Auteur (Z-A)')
-        self.listeOrder = ttk.Combobox(self.canevas,values = self.choixOrder, state = 'readonly')
-        self.listeOrder.set(self.choixOrder[0])
-        self.listeOrder.grid(row=0,column=0)
-        
-        self.searchField = AutocompleteEntry(self.commandes,self, self.canevas)
-        self.searchField.grid(row=0,column=1, sticky = W+E)
-        
-        self.choixSearch = ('Message contenant', 'Message commençant par')
-        self.listeSearch= ttk.Combobox(self.canevas,values = self.choixSearch, state = 'readonly')
-        self.listeSearch.set(self.choixSearch[0])
-        self.listeSearch.grid(row=0,column=2, sticky = E+W)
-        Button(self.canevas, text="Go!", command=self.recherche).grid(row=0, column=3)
-
-    def recherche(self):
-        trouve = self.onSearchComparaison(self.searchField.get())
-        self.ouvreUn(trouve[0])
-
-    def ouvreUn(self, mess):
-        top = Toplevel(self.root)
-        MesssageCanvas(top, self, mess)
-    
-    def setMessPanel(self):
-        self.m = PanedWindow(self.canevas,orient=VERTICAL, width=100, height=100)
-        self.canevas.create_window((0,0), window=self.m,anchor='nw', tags="panelMessage", height=100, width=100)
-        self.m.grid(row=1,column=0,columnspan=3,  sticky=W)
-        
-        self.remplirListe()
-        
-        self.canevas.tag_raise("panelHaut")
-        self.canevas.tag_lower("panelMessage")
-
-    def setEvents(self):
-        self.mess.bind_all("<MouseWheel>",self.scroll)
-        self.yscrollbar.bind('<ButtonRelease-1>',self.scroll)
-        
-        self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
-        #self.searchField.bind('<Key>', self.onSearchField)
-        
-        Button(self.canevas, text="Ajouter", command=self.ajouter).grid(row=2,column=2, sticky=W)
-
-    def OnFrameConfigure(self, event):
-        '''Reset the scroll region to encompass the inner frame'''
-        self.canevas.configure(scrollregion=self.canevas.bbox("all"))
-        
-    def bouge(self, type, amount, what=None):
-        if what:
-            self.canevas.yview(type, amount, what)
+    def ajouteMessage(self, texte, idSujet, user, messageRepondu):
+        if messageRepondu:
+            messageReponduId = messageRepondu.id
         else:
-            self.canevas.yview(type, amount)
+            messageReponduId = None
+        datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        datePresent = "'" + datePresent + "'"
+        texte = re.escape(texte)
+        texte = "'" + texte + "'"
+        user = "'" + user + "'"
+        if idSujet and messageReponduId:
+            self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date,user, reponse) VALUES(%s,%i,%s,%s, %i)"%(texte,idSujet,datePresent,user, messageReponduId), True)
+        elif not messageReponduId:
+            self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date,user) VALUES(%s,%i,%s,%s)"%(texte,idSujet,datePresent,user), True)
 
-    def scroll(self, event):
-        # print(event.delta)
-        self.canevas.yview(SCROLL, event.delta, "units")
-        
-    def onComboBox(self, event): #event
-        self.remplirListe()
-
-    def onSearchComparaison(self,texte):
-        return self.commandes.searchTextMessage(texte, self.id, self.listeSearch.get())
-
-    #def onSearchField(self, event): #event
-        #print("key", event.char)
-        #self.searchField
-        #self.canevas.tag_raise("panelHaut")
-        #self.canevas.tag_lower("panelMessage")
+    def ajouteSujet(self, nom, user):
+        datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        datePresent = "'" + datePresent + "'"
+        nom = re.escape(nom)
+        nom = "'" + nom + "'"
+        user = "'" + user + "'"
+        self.executeCommand("INSERT INTO SUJET(nom, date, user) VALUES(%s,%s, %s)"%(nom,datePresent, user), True)
     
-    def remplirListe(self):
-        #Delete messages
-        for message in self.messageGraphic:
-            message.canevas.destroy()
-        self.messageGraphic = []
-        
-        self.messages = self.commandes.searchMessages(self.id,self.listeOrder.get() )
-        for m in self.messages:
-            #m.texte = self.chopMessage(m)
-            self.messageGraphic.append(MesssageCanvas(self.m, self, m))
-            #self.message.insert(END,(m.texte, m.auteur, m.date))
+    def trouveIdSujet(self,nomSujet):
+        try:
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            cursor = db.cursor()
+            command = "SELECT id FROM SUJET WHERE nom = " + nomSujet
+            cursor.execute(command, (nomSujet))
+            result = cursor.fetchone()#Il devrait avoir qu'un sujet avec ce nom...
+            db.close()
+            return result[0]
+        except:
+            print("pas trouvé")
+            db.close()
 
-    def chopMessage(self,mess):
-        achop = False
-        result = ""
-        for i in range(len(mess.texte)):
-            if (i % 80) == 0:
-                achop = True
-            if achop and mess.texte[i] == ' ':
-                result += '\n'
-                achop = False
-            result += mess.texte[i]
-        return result
+        return None
+
+    def trouveTitreSujetByID(self, idSujet):
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        command = "SELECT nom FROM SUJET WHERE id = %i" % (idSujet)
+        cursor.execute(command)
+        nom = cursor.fetchone()
+        db.close()
+        return nom[0]
+    
+    def executeScript(self,path,db):
+        file = open(path, 'r')
+        fileCommands = file.read()
+        file.close()
+
+        sqlCommands = fileCommands.split(';')
+
+        for command in sqlCommands:
+            regex = re.search(r'\S', command, re.I)
+            if regex:
+                cursor = db.cursor()
+                cursor.execute(command)
+            else:
+                print("pas valide")
+
+
+    def creerUser(self,nom,prenom,username,passwd,mail):
+        if searchUser(username):
+            pass
+
+    def searchUser(self,username):
+        try:
+            cursor = self.db.cursor()
+            command = "SELECT * FROM USER WHERE username = " + username
+            cursor.execute(command)
+        except:
+            print("pas trouvé")
+
+    def searchSujets(self, orderById = 'Date croissante'):
+        cursor = -1 #Pas trouvé
+        try:
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            cursor = db.cursor()
+            orderByClause = self.orderByValue[orderById]
+            command = "SELECT * FROM SUJET ORDER BY %s" %(orderByClause)
+            cursor.execute(command)
+        except:
+            print("pas trouvé")
+
+        sujets = []
+        for (_id, nom, date, dernier,parent) in cursor:
+            nbMessages = self.searchNbMessages("'" + nom + "'")
+            sujet = Sujet(_id,nom,date,nbMessages,dernier,parent)
+            print("i", _id,nom,date,dernier,parent)
+            sujets.append(sujet)
+        db.close()
+
+        return sujets
+
+    def searchNbMessages(self,sujet):
+        try:
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            cursor = db.cursor()
+            idSujet = self.trouveIdSujet(sujet)
+            if idSujet == None:
+                db.close()
+                return 0
+            command = "SELECT COUNT(*) FROM MESSAGE WHERE sujet = " + str(idSujet)
+            cursor.execute(command)
+
+            result = cursor.fetchone()
+            db.close()
+            return result[0]
+        except:
+            print("pas trouvé")
+            db.close()
             
-    def ajouter(self, message=""):
-        nmess = Tk()
-        texte = Text(nmess)
-        texte.insert(END, message)
-        texte.pack()
-        Button(nmess, text="Envoyer", command=lambda: self.nouveau_message(nmess, texte)).pack()
+        return 0
 
-    def nouveau_message(self, nmess, texte, messageRepondu = None):
-        self.commandes.ajouteMessage(texte.get("1.0", END), self.id, getpass.getuser(), messageRepondu) # END ajoute un \n à la fin. On veut ça?
-        nmess.destroy()
-        self.remplirListe()
+    def searchMessageParID(self,idMessage):
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        command = "SELECT * FROM MESSAGE WHERE id = " + str(idMessage)
+        cursor.execute(command)
+        db.close()
+        result = cursor.fetchone()
+        return Message(result[0], result[1], result[2], result[4], result[3], result[5])
 
-    def supprimer(self, messageAsupprimer):
-        #indiceMessageListe = n[0]
-        #messageAsupprimer = self.messages[indiceMessageListe]
-        self.commandes.supprimerMessageParID(messageAsupprimer.id, self.id)
-        self.remplirListe()
+    def searchMessages(self, idSujet, orderById = 'Date décroissant'):
+        if True:
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            orderByClause = self.orderByValue[orderById]
+            cursor = db.cursor()
+            command = "SELECT * FROM MESSAGE WHERE sujet = %i ORDER BY %s" % (idSujet,orderByClause)
+            cursor.execute(command)
+        else:
+            db.close()
 
-    def repondre(self, messageArepondre):
-        #indiceMessageListe = n[0]
-        #messageArepondre = self.messages[indiceMessageListe]
-        message = self.commandes.searchMessageParID(messageArepondre.id)
-        rep = ""
-        rep += message.auteur + " à dit: \n> "
-        for c in message.texte:
-            rep += c
-            if c == '\n':
-                rep += "> "
-        rep += "\n\n"
-        self.ajouter(rep)
+        messages = []
+        
+        for (_id, text, date, reponse,user,sujet) in cursor:
+            message = Message(_id,text,date,user,reponse, sujet)
+            messages.append(message)
+        db.close()
+        return messages
+
+    def searchTextSujet(self,letters, typeSearch = 'Message contenant'):
+        idTypeSearch = self.searchTypeValue[typeSearch]
+        if idTypeSearch == 1 or idTypeSearch == 2: #Messages
+            return self.searchTextMessage(letters, None, typeSearch)
+        
+        try:
+            letters = self.formatTextSearch(idTypeSearch, letters)
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            cursor = db.cursor()
+            command = "SELECT * FROM SUJET WHERE nom LIKE %s" % (letters)
+            cursor.execute(command)
+            db.close()
+        except:
+            db.close()
+            return [] #Pas trouvé
+
+        sujets = []
+
+        for (_id, nom, date, dernier,parent) in cursor:
+            nbMessages = self.searchNbMessages("'" + nom + "'")
+            sujet = Sujet(_id,nom,date,nbMessages,dernier,parent)
+            print("i", _id,nom,date,dernier,parent)
+            sujets.append(sujet)
+
+        return sujets
+
+    def searchTextMessage(self,letters,idSujet, typeSearch = 'Message contenant'):
+        try:
+            if idSujet:
+                sujetSearch = "sujet = %i  AND " % (idSujet) #les messages d'un sujet
+            else:
+                sujetSearch = " " #Tous les messages
+                
+            letters = self.formatTextSearch(self.searchTypeValue[typeSearch], letters)
+            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+            cursor = db.cursor()
+            command = "SELECT * FROM MESSAGE WHERE %s texte LIKE %s" % (sujetSearch, letters)
+            cursor.execute(command)
+            db.close()
+        except:
+            db.close()
+            return [] #Pas trouvé
+
+        messages = []
+        
+        for (_id, text, date, reponse,user,sujet) in cursor:
+            message = Message(_id,text,date,user,reponse, sujet)
+            messages.append(message)
+        return messages
+
+    def formatTextSearch(self, idTypeSearch, texte):
+        if idTypeSearch == 1 or idTypeSearch == 3:
+            texte = "'%" + texte + "%'"
+        elif idTypeSearch == 2 or idTypeSearch == 4:
+            texte = "'" + texte + "%'"
+
+        return texte
+
+    def supprimerMessageParID(self, idMessage, idSujet):
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i  " % (idMessage, idSujet)
+        cursor.execute(command)
+        db.commit()
+        db.close()
+
+    def supprimerSujetParID(self, idSujet):
+        #Supprimer tous les messages de ce sujet
+        messages = self.searchMessages(idSujet)
+        if messages:
+            for message in messages:
+                self.supprimerMessageParID(message.id, idSujet)
+
+        #Supprimer le sujet
+        db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        cursor = db.cursor()
+        command = "DELETE FROM SUJET WHERE id = %i" % (idSujet)
+        cursor.execute(command)
+        db.commit()
+        db.close()
+
+
+    def connectionUser(self):
+        pass
+
+    def nouveauMessage(self):
+        pass
+
+
+def main():
+    c = Commandes()
+    #searchUser("Luc",db)
+    #searchUser("Luc",db)
+
+if __name__ == "__main__":
+    main()
