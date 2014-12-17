@@ -8,7 +8,7 @@ class MesssageCanvas():
         self.parent = parent #root
         self.message = message
         self.messageVue = messageVue
-        self.canevas = Canvas(self.parent, bg="white", width=800, height=175)
+        self.canevas = Canvas(self.parent, bg="white", width=800, height=175)#, scrollregion=(0,0,3000,3000))
         self.draw()
         self.canevas.pack()
 

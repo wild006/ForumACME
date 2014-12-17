@@ -243,7 +243,8 @@ class Commandes():
     def supprimerMessageParID(self, idMessage, idSujet, usr = ""):
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
-        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i  " % (idMessage, idSujet)
+        usr = "'" + usr + "'"
+        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i AND user = %s " % (idMessage, idSujet, usr)
         cursor.execute(command)
         db.commit()
         db.close()
@@ -258,8 +259,7 @@ class Commandes():
         #Supprimer le sujet
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
-        usr = "'" + usr + "'"
-        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i AND user = %s " % (idMessage, idSujet, usr)
+        command = "DELETE FROM SUJET WHERE id = %i" % (idSujet)
         cursor.execute(command)
         db.commit()
         db.close()

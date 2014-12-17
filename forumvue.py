@@ -213,13 +213,13 @@ class MessageVue():
 
     def onSearchComparaison(self,texte):
         return self.commandes.searchTextMessage(texte, self.id, self.listeSearch.get())
-    
+
     def remplirListe(self):
         #Delete messages
         for message in self.messageGraphic:
             message.canevas.destroy()
         self.messageGraphic = []
-
+        
         self.messages = []
         self.messages = self.commandes.searchMessages(self.id,self.listeOrder.get() )
         for m in self.messages:
@@ -229,7 +229,7 @@ class MessageVue():
         # self.canevas.configure(scrollregion=self.canevas.bbox("all"))
         self.canevas.config(scrollregion=(0,0, 800, (len(self.messages)+1)*(180)))
         self.canevas.create_window((400,(len(self.messages)+1)*(180/2)), window=self.m, tags="panelMessage")
-         
+
     def chopMessage(self,mess):
         achop = False
         result = ""
