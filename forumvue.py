@@ -8,6 +8,8 @@ from messageCanvas import *
 import getpass
 
 class Message():
+    """ Classe de donnée des messages
+    """
     def __init__(self, _id, text, date, auteur,reponse, sujetid):
         self.id = _id
         self.texte = text
@@ -17,6 +19,9 @@ class Message():
         self.sujetid = sujetid
         
 class Sujet():
+    """
+    Classe de donnée des sujets
+    """
     def __init__(self, _id, nom, date, nbMessages, dernier, parent):
         self.id = _id
         self.nom = nom
@@ -26,9 +31,11 @@ class Sujet():
         self.parent = parent
 
 class SujetVue():
+    """ Classe pour afficher les sujets
+    """
     def __init__(self, commandes):
         self.forum = Tk()
-        self.commandes = commandes
+        self.commandes = commandes # Pour la BD
         
         self.boxSujet = MultiListbox(self.forum, (('Message', 40), ('Date', 20), ('Nombre de messages', 10), ('Dernier message', 40)))
         self.sujets = [] # Tous les sujets
@@ -42,7 +49,10 @@ class SujetVue():
         Button(self.forum, text="Supprimer", command=lambda: self.supprimer(self.boxSujet.curselection())).grid(row=2,column=1)
         Button(self.forum, text="Ajouter", command=self.ajouter).grid(row=2,column=2)
 
-    def setSearchPanel(self):        
+    def setSearchPanel(self):
+        """
+        Initialise les widgets pour la recherche
+        """
         self.choixOrder = ('Date croissante', 'Date décroissante', 'Auteur (A-Z)', 'Auteur (Z-A)', 'Nom sujet (A-Z)','Nom sujet (Z-A)')
         self.listeOrder = ttk.Combobox(self.forum,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
@@ -59,27 +69,46 @@ class SujetVue():
         self.listeSearch.grid(row=0,column=2, sticky = E+W)
 
     def remplirListe(self):
+        """
+        Affiche les sujets dans la multilistbox
+        """
         self.boxSujet.delete(0, END)
         self.sujets = self.commandes.searchSujets(self.listeOrder.get())
         for sujet in self.sujets:
             m = self.commandes.searchMessages(sujet.id)
-            if m:
+            if m: # Si il y a date, on l'insere, sinon, on met un autre truc.
                 self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages, m[0].date))
             else:
                 self.boxSujet.insert(END, (sujet.nom, sujet.date, sujet.nbMessages, 'Jamais'))
+
     def onSearchComparaison(self,texte):
+        """
+        :param texte: Le texte à rechercher
+        :return: Les sujets qui matche texte
+        """
         return self.commandes.searchTextSujet(texte, self.listeSearch.get())
 
     def visioner(self, event):
+        """
+        :param event: L'event Tkinter
+        Ouvre une nouvelle fenêtre avec les messages
+        """
         MessageVue(self.sujets[int(event[0])].id, self.commandes, self.forum, self)
 
     def supprimer(self, event):
+        """
+        :param event: L'event Tkinter
+        Supprime le sujet, et rafraichi la liste de ceux-ci.
+        """
         indiceSujetListe = event[0]
         sujetASupprimer = self.sujets[int(indiceSujetListe)]
         self.commandes.supprimerSujetParID(sujetASupprimer.id)
         self.remplirListe()
         
     def ajouter(self):
+        """
+        Event pour ajouter un sujet
+        """
         nsujet = Tk()
         Label(nsujet, text="Titre").grid(column = 0, row = 0)
         titre = Entry(nsujet)
@@ -87,6 +116,12 @@ class SujetVue():
         Button(nsujet, text="Go", command=lambda:self.nouveau_sujet(nsujet, titre.get())).grid()
 
     def nouveau_sujet(self, nsujet, titre):
+        """
+        :param nsujet: La fenetre du nouveau sujet
+        :param titre: Le titre de celui-ci
+        Ajoute un sujet dans la liste.
+        Et rafraichi ceux-ci dans la vue.
+        """
         self.commandes.ajouteSujet(titre, getpass.getuser())
         nsujet.destroy()
         self.remplirListe()
@@ -96,7 +131,11 @@ class SujetVue():
         #self.searchField.bind("\n", self.recherche)
 
     def recherche(self):
-        print(self.searchField.get())
+        """
+        Fait la recherche.
+        Si l'option est pour les sujets, ouvre la liste des messages de celui trouvé.
+        Si l'option est pour un message, ouvre celui-ci.
+        """
         trouve = self.onSearchComparaison(self.searchField.get())
         
         if self.listeSearch.get() == self.choixSearch[0] or self.listeSearch.get() == self.choixSearch[1]:
@@ -108,10 +147,16 @@ class SujetVue():
         self.remplirListe()
 
     def ouvreUn(self, mess):
+        """
+        :param mess: Le message.
+        Ouvre un message.
+        """
         top = Toplevel(self.forum)
         MesssageCanvas(top, self, mess)
         
 class MessageVue():
+    """ Classe pour afficher les messages à partir d'un sujet
+    """
     def __init__(self, n, commandes, root, sujetVue=None):
         """Affiche les messages du sujet a l'id `n'"""
         self.commandes = commandes
@@ -125,6 +170,10 @@ class MessageVue():
 
         
     def initVue(self, root):
+        """
+        :param root: La fenêtre root.
+        Initialise toute la fenêtre.
+        """
         self.setTopLevel(root)
         self.setCanevas()
         self.setSearchPanel()
@@ -136,10 +185,11 @@ class MessageVue():
         # self.mess.title(self.commandes.trouveTitreSujetByID(self.id))
 
         self.frame = Frame(self.mess, bd=2, relief=SUNKEN, width=800, height=500)
-        # self.frame.grid_rowconfigure(0, weight=1)
-        # self.frame.grid_columnconfigure(0, weight=3)
         
     def setCanevas(self):
+        """
+        Initialise le canevas, et, avec notre surprise et notre sueur, ça marche.
+        """
         self.yscrollbar = Scrollbar(self.frame)
 
         self.yscrollbar.grid(row=1, column=4, sticky=N+S)
@@ -148,11 +198,12 @@ class MessageVue():
         self.canevas.grid(row=1, column = 0, columnspan = 4)
 
         self.yscrollbar.config(command=self.bouge)
-        # self.frame.bind("<Configure>", self.OnFrameConfigure)
-        # self.frame.grid(row=0, column=0, sticky=W+E+N+S)
         self.frame.pack()
         
-    def setSearchPanel(self):        
+    def setSearchPanel(self):
+        """
+        Initialise le panel de recherche
+        """
         self.choixOrder = ('Date croissante', 'Date décroissante', 'Auteur (A-Z)', 'Auteur (Z-A)')
         self.listeOrder = ttk.Combobox(self.frame,values = self.choixOrder, state = 'readonly')
         self.listeOrder.set(self.choixOrder[0])
@@ -172,14 +223,14 @@ class MessageVue():
         self.ouvreUn(trouve[0])
 
     def ouvreUn(self, mess):
+        """
+        Ouvre le message trouvé dans la boite à input
+        """
         top = Toplevel(self.root)
         MesssageCanvas(top, self, mess)
     
     def setMessPanel(self):
         self.m = PanedWindow(self.canevas,orient=VERTICAL)
-        # self.canevas.create_window((400,), window=self.m, tags="panelMessage")
-        # self.m.grid(row=2,column=0,columnspan=3,  sticky=W)
-        
         self.remplirListe()
         
         self.canevas.tag_raise("panelHaut")
@@ -190,12 +241,10 @@ class MessageVue():
         self.yscrollbar.bind('<ButtonRelease-1>',self.scroll)
         
         self.listeOrder.bind('<<ComboboxSelected>>', self.onComboBox)
-        #self.searchField.bind('<Key>', self.onSearchField)
-        
+
         Button(self.frame, text="Ajouter", command=self.ajouter).grid(row=0,column=4)
 
     def OnFrameConfigure(self, event):
-        '''Reset the scroll region to encompass the inner frame'''
         self.canevas.configure(scrollregion=self.canevas.bbox("all"))
         
     def bouge(self, type, amount, what=None):
@@ -205,7 +254,10 @@ class MessageVue():
             self.canevas.yview(type, amount)
 
     def scroll(self, event):
-        # print(event.delta)
+     """
+     :param event: L'event Tkinter
+     Scroll selon le mouvement fait avec la molette.
+     """
         self.canevas.yview(SCROLL, -(event.delta*120), "units")
         
     def onComboBox(self, event): #event
@@ -223,14 +275,17 @@ class MessageVue():
         self.messages = []
         self.messages = self.commandes.searchMessages(self.id,self.listeOrder.get() )
         for m in self.messages:
-            #m.texte = self.chopMessage(m)
             self.messageGraphic.append(MesssageCanvas(self.m, self, m))
-            #self.message.insert(END,(m.texte, m.auteur, m.date))
-        # self.canevas.configure(scrollregion=self.canevas.bbox("all"))
+
+        # Ouais, c'est un peu complèxe, on sait pas trop non plus..
         self.canevas.config(scrollregion=(0,0, 800, (len(self.messages)+1)*(180)))
         self.canevas.create_window((400,(len(self.messages)+1)*(180/2)), window=self.m, tags="panelMessage")
 
     def chopMessage(self,mess):
+        """
+        :param mess: L'objet Message
+        :return: Insère un \n à chaque 80 characères, ou au prochain espace le plus proche
+        """
         achop = False
         result = ""
         for i in range(len(mess.texte)):
@@ -263,8 +318,6 @@ class MessageVue():
             self.parent.remplirListe()
 
     def repondre(self, messageArepondre):
-        #indiceMessageListe = n[0]
-        #messageArepondre = self.messages[indiceMessageListe]
         message = self.commandes.searchMessageParID(messageArepondre.id)
         rep = ""
         rep += message.auteur + " à dit: \n> "
