@@ -1,0 +1,2 @@
+CREATE USER 'userForum'@'%' IDENTIFIED BY 'AAAaaa111';
+GRANT SELECT, INSERT, DELETE ON *.* TO 'userForum'@'%';

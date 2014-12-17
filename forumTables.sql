@@ -1,12 +1,3 @@
-CREATE TABLE IF NOT EXISTS USER(
-	id INTEGER NOT NULL AUTO_INCREMENT,
-	nom varchar(50) NOT NULL, 
-	prenom varchar(50), 
-	username varchar(100), 
-	passwd varchar(255), 
-	mail varchar(120),  
-	PRIMARY KEY ( id ))ENGINE = innoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
-	
 CREATE TABLE IF NOT EXISTS SUJET(
 	id INTEGER NOT NULL AUTO_INCREMENT, 
 	nom varchar(50), 

@@ -8,43 +8,15 @@ nomDB = "FORUM"
 
 class Commandes():
     def __init__(self):
-        self.user = "root"
+        self.user = "userForum"
         self.passwd = "AAAaaa111"
         self.host = "127.0.0.1"
         self.nomDB = "FORUM"
         self.orderByValue = {'Date croissante':"date ASC ", 'Date décroissante':"date DESC", 'Auteur (A-Z)':"user ASC", 'Auteur (Z-A)':"user DESC", 'Nom sujet (A-Z)':"nom ASC",'Nom sujet (Z-A)':"nom DESC"}
         self.searchTypeValue = {'Message contenant':1, 'Message commençant par':2,'Sujet contenant':3, 'Sujet commençant par':4}
-        self.startUp()
         self.v = SujetVue(self)
         self.v.forum.mainloop()
-
-
-    def startUp(self):
-        try:
-            db = mysql.connector.connect(user=self.user, password=self.passwd,
-                                          host=self.host,
-                                         database= self.nomDB)
-            #Tester toutes les tables ? (Corrumption)
-        except:
-            print("pas créé !")
-            db = mysql.connector.connect(host=self.host,
-                                         user=self.user,passwd=self.passwd)
-            self.executeScript("forumDB.sql", db)
-            db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
-            self.executeScript("forumTables.sql", db)
-
-        #POUR DES TESTS
-        #INSERTION DE SUJETS
-        #self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('LOL', '1776-7-4 04:13:54')", True)
-        #self.executeCommand("INSERT INTO SUJET(nom, date) VALUES('Pourquoi pas ? ', '1776-7-4 04:13:54')", True)
-        #INSERTION DE MESSAGES
-        #self.insererMessage("'LOL'", "'Premier insert'")
-        #self.insererMessage("'LOL'", "'Deuxième insert'")
-        #self.insererMessage("'Pourquoi pas ? '", "'Un autre message !!!'")
-        #idSujet = self.trouveIdSujet("'LOL'")
-        #print("id",idSujet)
-        #if idSujet:
-        #    self.executeCommand("INSERT INTO MESSAGE(texte, sujet) VALUES('Un message très important !!', " + str(idSujet) + ")", True)
+  
 
     def connectionDB(self,user, password, host, nomBD):
         return mysql.connector.connect(user=user, password=password,
@@ -52,7 +24,6 @@ class Commandes():
                                          database= nomDB)
 
     def executeCommand(self,command, commit = False):
-        #POUR DES TESTS !
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
         cursor.execute(command)
@@ -269,7 +240,7 @@ class Commandes():
 
         return texte
 
-    def supprimerMessageParID(self, idMessage, idSujet):
+    def supprimerMessageParID(self, idMessage, idSujet, usr = ""):
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
         command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i  " % (idMessage, idSujet)
@@ -287,23 +258,15 @@ class Commandes():
         #Supprimer le sujet
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
-        command = "DELETE FROM SUJET WHERE id = %i" % (idSujet)
+        usr = "'" + usr + "'"
+        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i AND user = %s " % (idMessage, idSujet, usr)
         cursor.execute(command)
         db.commit()
         db.close()
 
 
-    def connectionUser(self):
-        pass
-
-    def nouveauMessage(self):
-        pass
-
-
 def main():
     c = Commandes()
-    #searchUser("Luc",db)
-    #searchUser("Luc",db)
 
 if __name__ == "__main__":
     main()
