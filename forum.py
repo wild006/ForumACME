@@ -24,11 +24,16 @@ class Commandes():
                                          database= nomDB)
 
     def executeCommand(self,command, commit = False):
+        #connection, execution et commit
+        
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
+        
         cursor = db.cursor()
         cursor.execute(command)
+        
         if commit:
             db.commit()
+            
         db.close()
 
     def insererMessage(self, nomSujet, texte):
@@ -41,25 +46,30 @@ class Commandes():
 
     def ajouteMessage(self, texte, idSujet, user, messageRepondu):
         if messageRepondu:
-            messageReponduId = messageRepondu.id
+            messageReponduId = messageRepondu.id #Une réponse à un autre message
         else:
             messageReponduId = None
+
+        #Formater le texte
         datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         datePresent = "'" + datePresent + "'"
         texte = re.escape(texte)
         texte = "'" + texte + "'"
         user = "'" + user + "'"
-        if idSujet and messageReponduId:
+        
+        if idSujet and messageReponduId: #Une réponse à un autre message
             self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date,user, reponse) VALUES(%s,%i,%s,%s, %i)"%(texte,idSujet,datePresent,user, messageReponduId), True)
         elif not messageReponduId:
             self.executeCommand("INSERT INTO MESSAGE(texte, sujet, date,user) VALUES(%s,%i,%s,%s)"%(texte,idSujet,datePresent,user), True)
 
     def ajouteSujet(self, nom, user):
+        #Formater le texte
         datePresent = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         datePresent = "'" + datePresent + "'"
         nom = re.escape(nom)
         nom = "'" + nom + "'"
         user = "'" + user + "'"
+        
         self.executeCommand("INSERT INTO SUJET(nom, date, user) VALUES(%s,%s, %s)"%(nom,datePresent, user), True)
     
     def trouveIdSujet(self,nomSujet):
@@ -77,7 +87,7 @@ class Commandes():
 
         return None
 
-    def trouveTitreSujetByID(self, idSujet):
+    def trouveTitreSujetByID(self, idSujet): 
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
         command = "SELECT nom FROM SUJET WHERE id = %i" % (idSujet)
@@ -101,11 +111,6 @@ class Commandes():
             else:
                 print("pas valide")
 
-
-    def creerUser(self,nom,prenom,username,passwd,mail):
-        if searchUser(username):
-            pass
-
     def searchUser(self,username):
         try:
             cursor = self.db.cursor()
@@ -127,6 +132,7 @@ class Commandes():
 
         sujets = []
         for (_id, nom, date, dernier,parent) in cursor:
+            #Construction de l'objet sujet
             nbMessages = self.searchNbMessages("'" + nom + "'")
             sujet = Sujet(_id,nom,date,nbMessages,dernier,parent)
             print("i", _id,nom,date,dernier,parent)
@@ -142,11 +148,11 @@ class Commandes():
             idSujet = self.trouveIdSujet(sujet)
             if idSujet == None:
                 db.close()
-                return 0
+                return 0 #Aucun message dans le sujet
             command = "SELECT COUNT(*) FROM MESSAGE WHERE sujet = " + str(idSujet)
             cursor.execute(command)
 
-            result = cursor.fetchone()
+            result = cursor.fetchone() #Il n'y a qu'un result: le count 
             db.close()
             return result[0]
         except:
@@ -175,8 +181,9 @@ class Commandes():
             db.close()
 
         messages = []
-        
+
         for (_id, text, date, reponse,user,sujet) in cursor:
+            #Construction de l'objet sujet
             message = Message(_id,text,date,user,reponse, sujet)
             messages.append(message)
         db.close()
@@ -184,9 +191,10 @@ class Commandes():
 
     def searchTextSujet(self,letters, typeSearch = 'Message contenant'):
         idTypeSearch = self.searchTypeValue[typeSearch]
-        if idTypeSearch == 1 or idTypeSearch == 2: #Messages
+        if idTypeSearch == 1 or idTypeSearch == 2: #Recherche Messages
             return self.searchTextMessage(letters, None, typeSearch)
-        
+
+        #Recherche Sujet
         try:
             letters = self.formatTextSearch(idTypeSearch, letters)
             db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
@@ -233,6 +241,7 @@ class Commandes():
         return messages
 
     def formatTextSearch(self, idTypeSearch, texte):
+        #Formater le texte selon le type de recherche
         if idTypeSearch == 1 or idTypeSearch == 3:
             texte = "'%" + texte + "%'"
         elif idTypeSearch == 2 or idTypeSearch == 4:

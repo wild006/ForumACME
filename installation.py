@@ -10,7 +10,7 @@ def executeScript(path,db):
     fileCommands = file.read()
     file.close()
 
-    sqlCommands = fileCommands.split(';')
+    sqlCommands = fileCommands.split(';')#Séparer les commandes
 
     for command in sqlCommands:
         regex = re.search(r'\S', command, re.I)
@@ -18,7 +18,7 @@ def executeScript(path,db):
             cursor = db.cursor()
             cursor.execute(command)
         else:
-            print("Commande pas valide")
+            print("Commande pas valide") #Blanc ou retour de chariot
 
 def startUp():
     user = "root"

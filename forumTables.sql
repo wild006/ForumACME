@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS SUJET(
 	date DATETIME, 
 	user varchar(100), 
 	parent INTEGER REFERENCES SUJET(id), 
+	INDEX (date),
 	PRIMARY KEY ( id ))ENGINE = innoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 	
 CREATE TABLE IF NOT EXISTS MESSAGE(
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS MESSAGE(
 	user varchar(100),
 	sujet INTEGER REFERENCES SUJET(id),
 	PRIMARY KEY(id),
+	INDEX (date),
 	FULLTEXT (texte))ENGINE = innoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 	
 	
