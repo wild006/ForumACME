@@ -7,15 +7,6 @@ from autocompleteEntry import *
 from messageCanvas import *
 import getpass
 
-class User():
-    def __init__(self, _id, nom, prenom, username, passwd, mail):
-        self.id = _id
-        self.nom = nom
-        self.prenom = prenom
-        self.username = username
-        self.passwd = passwd
-        self.mail = mail
-
 class Message():
     def __init__(self, _id, text, date, auteur,reponse, sujetid):
         self.id = _id
@@ -190,7 +181,7 @@ class MessageVue():
         # self.m.grid(row=2,column=0,columnspan=3,  sticky=W)
         
         self.remplirListe()
-        self.canevas.create_window((400,len(self.messages)*(175/2)), window=self.m, tags="panelMessage")
+
         
         self.canevas.tag_raise("panelHaut")
         self.canevas.tag_lower("panelMessage")
@@ -216,7 +207,7 @@ class MessageVue():
 
     def scroll(self, event):
         # print(event.delta)
-        self.canevas.yview(SCROLL, 1, "units")
+        self.canevas.yview(SCROLL, -(event.delta*120), "units")
         
     def onComboBox(self, event): #event
         self.remplirListe()
@@ -224,25 +215,20 @@ class MessageVue():
     def onSearchComparaison(self,texte):
         return self.commandes.searchTextMessage(texte, self.id, self.listeSearch.get())
 
-    #def onSearchField(self, event): #event
-        #print("key", event.char)
-        #self.searchField
-        #self.canevas.tag_raise("panelHaut")
-        #self.canevas.tag_lower("panelMessage")
-    
     def remplirListe(self):
         #Delete messages
         for message in self.messageGraphic:
             message.canevas.destroy()
         self.messageGraphic = []
-        
+        self.messages = []
         self.messages = self.commandes.searchMessages(self.id,self.listeOrder.get() )
         for m in self.messages:
             #m.texte = self.chopMessage(m)
             self.messageGraphic.append(MesssageCanvas(self.m, self, m))
             #self.message.insert(END,(m.texte, m.auteur, m.date))
         # self.canevas.configure(scrollregion=self.canevas.bbox("all"))
-        self.canevas.config(scrollregion=(0,0, 0, len(self.messages)*175))
+        self.canevas.config(scrollregion=(0,0, 800, (len(self.messages)+1)*(180)))
+        self.canevas.create_window((400,(len(self.messages)+1)*(180/2)), window=self.m, tags="panelMessage")
         
     def chopMessage(self,mess):
         achop = False
@@ -271,10 +257,10 @@ class MessageVue():
             self.parent.remplirListe()
         
     def supprimer(self, messageAsupprimer):
-        #indiceMessageListe = n[0]
-        #messageAsupprimer = self.messages[indiceMessageListe]
-        self.commandes.supprimerMessageParID(messageAsupprimer.id, self.id)
+        self.commandes.supprimerMessageParID(messageAsupprimer.id, self.id, getpass.getuser())
         self.remplirListe()
+        if self.parent:
+            self.parent.remplirListe()
 
     def repondre(self, messageArepondre):
         #indiceMessageListe = n[0]

@@ -9,7 +9,7 @@ nomDB = "FORUM"
 class Commandes():
     def __init__(self):
         self.user = "root"
-        self.passwd = "AAAaaa111"
+        self.passwd = "aaaAAA111"
         self.host = "127.0.0.1"
         self.nomDB = "FORUM"
         self.orderByValue = {'Date croissante':"date ASC ", 'Date décroissante':"date DESC", 'Auteur (A-Z)':"user ASC", 'Auteur (Z-A)':"user DESC", 'Nom sujet (A-Z)':"nom ASC",'Nom sujet (Z-A)':"nom DESC"}
@@ -269,10 +269,11 @@ class Commandes():
 
         return texte
 
-    def supprimerMessageParID(self, idMessage, idSujet):
+    def supprimerMessageParID(self, idMessage, idSujet, usr = ""):
         db = self.connectionDB(self.user,self.passwd,self.host,self.nomDB)
         cursor = db.cursor()
-        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i  " % (idMessage, idSujet)
+        usr = "'" + usr + "'"
+        command = "DELETE FROM MESSAGE WHERE id = %i AND sujet = %i AND user = %s " % (idMessage, idSujet, usr)
         cursor.execute(command)
         db.commit()
         db.close()
