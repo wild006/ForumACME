@@ -129,6 +129,7 @@ class Commandes():
             cursor.execute(command)
         except:
             print("pas trouvé")
+            return []
 
         sujets = []
         for (_id, nom, date, dernier,parent) in cursor:

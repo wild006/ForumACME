@@ -254,10 +254,10 @@ class MessageVue():
             self.canevas.yview(type, amount)
 
     def scroll(self, event):
-     """
-     :param event: L'event Tkinter
-     Scroll selon le mouvement fait avec la molette.
-     """
+        """
+        :param event: L'event Tkinter
+        Scroll selon le mouvement fait avec la molette.
+        """
         self.canevas.yview(SCROLL, -(event.delta*120), "units")
         
     def onComboBox(self, event): #event
